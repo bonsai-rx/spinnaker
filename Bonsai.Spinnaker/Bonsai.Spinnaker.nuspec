@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://bitbucket.org/horizongir/bonsai.spinnaker/raw/4f1565edb797ce06445e047a91efe9341db0d8f0/LICENSE</licenseUrl>
+    <projectUrl>https://bitbucket.org/horizongir/bonsai.spinnaker</projectUrl>
+    <iconUrl>https://bitbucket.org/horizongir/bonsai/raw/7aacc64dc4647e57362ab310238591dc197fef0d/Resources/Bonsai.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <copyright>$author$ © 2017</copyright>
+    <tags>Bonsai FLIR PointGrey Spinnaker</tags>
+  </metadata>
+  <files>
+    <file src="..\Externals\SpinnakerNET\**\*.dll" target="build\net45\bin"/>
+  </files>
+</package>
