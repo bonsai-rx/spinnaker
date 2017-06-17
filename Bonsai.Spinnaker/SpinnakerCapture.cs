@@ -62,8 +62,8 @@ namespace Bonsai.Spinnaker
                                 {
                                     if (image.IsIncomplete)
                                     {
-                                        var message = string.Format("Acquired incomplete image with image status {0}", image.ImageStatus);
-                                        throw new InvalidOperationException(message);
+                                        // drop incomplete frames
+                                        continue;
                                     }
 
                                     IplImage output;
