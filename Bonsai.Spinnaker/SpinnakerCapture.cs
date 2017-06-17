@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace Bonsai.Spinnaker
 {
-    public class SpinnakerCapture : Source<IplImage>
+    public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
-        IObservable<IplImage> source;
+        IObservable<SpinnakerDataFrame> source;
         readonly object captureLock = new object();
 
         public SpinnakerCapture()
         {
-            source = Observable.Create<IplImage>((observer, cancellationToken) =>
+            source = Observable.Create<SpinnakerDataFrame>((observer, cancellationToken) =>
             {
                 return Task.Factory.StartNew(() =>
                 {
@@ -92,7 +92,7 @@ namespace Bonsai.Spinnaker
                                         }
                                     }
 
-                                    observer.OnNext(output);
+                                    observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
                                 }
                             }
                         }
@@ -114,7 +114,7 @@ namespace Bonsai.Spinnaker
 
         public int Index { get; set; }
 
-        public override IObservable<IplImage> Generate()
+        public override IObservable<SpinnakerDataFrame> Generate()
         {
             return source;
         }

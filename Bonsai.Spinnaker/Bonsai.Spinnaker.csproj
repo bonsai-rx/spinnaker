@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpinnakerCapture.cs" />
+    <Compile Include="SpinnakerDataFrame.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Bonsai.Spinnaker.nuspec" />
