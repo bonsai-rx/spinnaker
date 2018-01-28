@@ -13,6 +13,7 @@ namespace Bonsai.Spinnaker
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
         IObservable<SpinnakerDataFrame> source;
+        static readonly object systemLock = new object();
         readonly object captureLock = new object();
 
         public SpinnakerCapture()
@@ -21,9 +22,9 @@ namespace Bonsai.Spinnaker
             {
                 return Task.Factory.StartNew(() =>
                 {
-                    lock (captureLock)
+                    IManagedCamera camera;
+                    lock (systemLock)
                     {
-                        IManagedCamera camera;
                         using (var system = new ManagedSystem())
                         {
                             var index = Index;
@@ -34,8 +35,12 @@ namespace Bonsai.Spinnaker
                             }
 
                             camera = cameraList[index];
+                            cameraList.Clear();
                         }
+                    }
 
+                    lock (captureLock)
+                    {
                         try
                         {
                             camera.Init();
