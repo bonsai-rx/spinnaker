@@ -46,6 +46,27 @@ namespace Bonsai.Spinnaker
                             camera.Init();
 
                             var nodeMap = camera.GetNodeMap();
+                            var chunkMode = nodeMap.GetNode<IBool>("ChunkModeActive");
+                            if (chunkMode != null && chunkMode.IsWritable)
+                            {
+                                chunkMode.Value = true;
+                                var chunkSelector = nodeMap.GetNode<IEnum>("ChunkSelector");
+                                if (chunkSelector != null && chunkSelector.IsReadable)
+                                {
+                                    var entries = chunkSelector.Entries;
+                                    for (int i = 0; i < entries.Length; i++)
+                                    {
+                                        var chunkSelectorEntry = entries[i];
+                                        if (!chunkSelectorEntry.IsAvailable || !chunkSelectorEntry.IsReadable) continue;
+
+                                        chunkSelector.Value = chunkSelectorEntry.Value;
+                                        var chunkEnable = nodeMap.GetNode<IBool>("ChunkEnable");
+                                        if (chunkEnable == null || chunkEnable.Value || !chunkEnable.IsWritable) continue;
+                                        chunkEnable.Value = true;
+                                    }
+                                }
+                            }
+
                             var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
                             if (acquisitionMode == null || !acquisitionMode.IsWritable)
                             {
