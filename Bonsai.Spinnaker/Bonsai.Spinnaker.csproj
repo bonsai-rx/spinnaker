@@ -43,8 +43,8 @@
       <HintPath>..\packages\OpenCV.Net.3.3.1\lib\net40\OpenCV.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SpinnakerNET_v120">
-      <HintPath>..\Externals\SpinnakerNET\x86\SpinnakerNET_v120.dll</HintPath>
+    <Reference Include="SpinnakerNET_v140">
+      <HintPath>..\Externals\SpinnakerNET\x86\SpinnakerNET_v140.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
