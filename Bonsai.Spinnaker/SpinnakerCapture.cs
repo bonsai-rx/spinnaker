@@ -3,6 +3,7 @@ using SpinnakerNET;
 using SpinnakerNET.GenApi;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Bonsai.Spinnaker
 {
+    [Description("Acquires a sequence of images from a Spinnaker camera.")]
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
         IObservable<SpinnakerDataFrame> source;
@@ -121,8 +123,10 @@ namespace Bonsai.Spinnaker
             .RefCount();
         }
 
+        [Description("The index of the camera from which to acquire images.")]
         public int Index { get; set; }
 
+        [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
         static Func<IManagedImage, IplImage> GetConverter(PixelFormatEnums pixelFormat, ColorProcessingAlgorithm colorProcessing)
