@@ -73,6 +73,8 @@
     <Compile Include="SpinnakerDataFrame.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Bonsai.Spinnaker.targets" />
+    <None Include="Bonsai.Spinnaker.props" />
     <None Include="Bonsai.Spinnaker.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
