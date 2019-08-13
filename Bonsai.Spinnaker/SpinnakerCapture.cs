@@ -46,42 +46,7 @@ namespace Bonsai.Spinnaker
                         try
                         {
                             camera.Init();
-
-                            var nodeMap = camera.GetNodeMap();
-                            var chunkMode = nodeMap.GetNode<IBool>("ChunkModeActive");
-                            if (chunkMode != null && chunkMode.IsWritable)
-                            {
-                                chunkMode.Value = true;
-                                var chunkSelector = nodeMap.GetNode<IEnum>("ChunkSelector");
-                                if (chunkSelector != null && chunkSelector.IsReadable)
-                                {
-                                    var entries = chunkSelector.Entries;
-                                    for (int i = 0; i < entries.Length; i++)
-                                    {
-                                        var chunkSelectorEntry = entries[i];
-                                        if (!chunkSelectorEntry.IsAvailable || !chunkSelectorEntry.IsReadable) continue;
-
-                                        chunkSelector.Value = chunkSelectorEntry.Value;
-                                        var chunkEnable = nodeMap.GetNode<IBool>("ChunkEnable");
-                                        if (chunkEnable == null || chunkEnable.Value || !chunkEnable.IsWritable) continue;
-                                        chunkEnable.Value = true;
-                                    }
-                                }
-                            }
-
-                            var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
-                            if (acquisitionMode == null || !acquisitionMode.IsWritable)
-                            {
-                                throw new InvalidOperationException("Unable to set acquisition mode to continuous.");
-                            }
-
-                            var continuousAcquisitionMode = acquisitionMode.GetEntryByName("Continuous");
-                            if (continuousAcquisitionMode == null || !continuousAcquisitionMode.IsReadable)
-                            {
-                                throw new InvalidOperationException("Unable to set acquisition mode to continuous.");
-                            }
-
-                            acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
+                            Configure(camera);
                             camera.BeginAcquisition();
 
                             var imageFormat = default(PixelFormatEnums);
@@ -128,6 +93,45 @@ namespace Bonsai.Spinnaker
 
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
+
+        protected virtual void Configure(IManagedCamera camera)
+        {
+            var nodeMap = camera.GetNodeMap();
+            var chunkMode = nodeMap.GetNode<IBool>("ChunkModeActive");
+            if (chunkMode != null && chunkMode.IsWritable)
+            {
+                chunkMode.Value = true;
+                var chunkSelector = nodeMap.GetNode<IEnum>("ChunkSelector");
+                if (chunkSelector != null && chunkSelector.IsReadable)
+                {
+                    var entries = chunkSelector.Entries;
+                    for (int i = 0; i < entries.Length; i++)
+                    {
+                        var chunkSelectorEntry = entries[i];
+                        if (!chunkSelectorEntry.IsAvailable || !chunkSelectorEntry.IsReadable) continue;
+
+                        chunkSelector.Value = chunkSelectorEntry.Value;
+                        var chunkEnable = nodeMap.GetNode<IBool>("ChunkEnable");
+                        if (chunkEnable == null || chunkEnable.Value || !chunkEnable.IsWritable) continue;
+                        chunkEnable.Value = true;
+                    }
+                }
+            }
+
+            var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
+            if (acquisitionMode == null || !acquisitionMode.IsWritable)
+            {
+                throw new InvalidOperationException("Unable to set acquisition mode to continuous.");
+            }
+
+            var continuousAcquisitionMode = acquisitionMode.GetEntryByName("Continuous");
+            if (continuousAcquisitionMode == null || !continuousAcquisitionMode.IsReadable)
+            {
+                throw new InvalidOperationException("Unable to set acquisition mode to continuous.");
+            }
+
+            acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
+        }
 
         static Func<IManagedImage, IplImage> GetConverter(PixelFormatEnums pixelFormat, ColorProcessingAlgorithm colorProcessing)
         {
