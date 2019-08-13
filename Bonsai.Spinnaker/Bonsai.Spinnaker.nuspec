@@ -11,7 +11,7 @@
     <iconUrl>https://bitbucket.org/horizongir/bonsai/raw/7aacc64dc4647e57362ab310238591dc197fef0d/Resources/Bonsai.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>$author$ © 2017</copyright>
+    <copyright>$author$ © 2019</copyright>
     <releaseNotes>Support for Spinnaker version 1.23.0.27.</releaseNotes>
     <tags>Bonsai FLIR PointGrey Spinnaker</tags>
   </metadata>
