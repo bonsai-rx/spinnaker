@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,79 +15,7 @@ namespace Bonsai.Spinnaker
     [Description("Acquires a sequence of images from a Spinnaker camera.")]
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
-        IObservable<SpinnakerDataFrame> source;
         static readonly object systemLock = new object();
-        readonly object captureLock = new object();
-
-        public SpinnakerCapture()
-        {
-            source = Observable.Create<SpinnakerDataFrame>((observer, cancellationToken) =>
-            {
-                return Task.Factory.StartNew(() =>
-                {
-                    IManagedCamera camera;
-                    lock (systemLock)
-                    {
-                        using (var system = new ManagedSystem())
-                        {
-                            var index = Index;
-                            var cameraList = system.GetCameras();
-                            if (index < 0 || index >= cameraList.Count)
-                            {
-                                throw new InvalidOperationException("No Spinnaker camera with the specified index was found.");
-                            }
-
-                            camera = cameraList[index];
-                            cameraList.Clear();
-                        }
-                    }
-
-                    lock (captureLock)
-                    {
-                        try
-                        {
-                            camera.Init();
-                            Configure(camera);
-                            camera.BeginAcquisition();
-
-                            var imageFormat = default(PixelFormatEnums);
-                            var converter = default(Func<IManagedImage, IplImage>);
-                            while (!cancellationToken.IsCancellationRequested)
-                            {
-                                using (var image = camera.GetNextImage())
-                                {
-                                    if (image.IsIncomplete)
-                                    {
-                                        // drop incomplete frames
-                                        continue;
-                                    }
-
-                                    if (converter == null || image.PixelFormat != imageFormat)
-                                    {
-                                        converter = GetConverter(image.PixelFormat, ColorProcessing);
-                                        imageFormat = image.PixelFormat;
-                                    }
-
-                                    var output = converter(image);
-                                    observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            camera.EndAcquisition();
-                            camera.DeInit();
-                            camera.Dispose();
-                        }
-                    }
-                },
-                cancellationToken,
-                TaskCreationOptions.LongRunning,
-                TaskScheduler.Default);
-            })
-            .PublishReconnectable()
-            .RefCount();
-        }
 
         [Description("The index of the camera from which to acquire images.")]
         public int Index { get; set; }
@@ -192,7 +121,73 @@ namespace Bonsai.Spinnaker
 
         public override IObservable<SpinnakerDataFrame> Generate()
         {
-            return source;
+            return Generate(Observable.Return(Unit.Default));
+        }
+
+        public IObservable<SpinnakerDataFrame> Generate<TSource>(IObservable<TSource> start)
+        {
+            return Observable.Create<SpinnakerDataFrame>((observer, cancellationToken) =>
+            {
+                return Task.Factory.StartNew(async () =>
+                {
+                    IManagedCamera camera;
+                    lock (systemLock)
+                    {
+                        using (var system = new ManagedSystem())
+                        {
+                            var index = Index;
+                            var cameraList = system.GetCameras();
+                            if (index < 0 || index >= cameraList.Count)
+                            {
+                                throw new InvalidOperationException("No Spinnaker camera with the specified index was found.");
+                            }
+
+                            camera = cameraList[index];
+                            cameraList.Clear();
+                        }
+                    }
+
+                    try
+                    {
+                        camera.Init();
+                        Configure(camera);
+                        camera.BeginAcquisition();
+                        await start;
+
+                        var imageFormat = default(PixelFormatEnums);
+                        var converter = default(Func<IManagedImage, IplImage>);
+                        while (!cancellationToken.IsCancellationRequested)
+                        {
+                            using (var image = camera.GetNextImage())
+                            {
+                                if (image.IsIncomplete)
+                                {
+                                    // drop incomplete frames
+                                    continue;
+                                }
+
+                                if (converter == null || image.PixelFormat != imageFormat)
+                                {
+                                    converter = GetConverter(image.PixelFormat, ColorProcessing);
+                                    imageFormat = image.PixelFormat;
+                                }
+
+                                var output = converter(image);
+                                observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        camera.EndAcquisition();
+                        camera.DeInit();
+                        camera.Dispose();
+                    }
+                },
+                cancellationToken,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
+            });
         }
     }
 }
