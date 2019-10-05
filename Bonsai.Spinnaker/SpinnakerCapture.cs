@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -177,6 +178,8 @@ namespace Bonsai.Spinnaker
                             }
                         }
                     }
+                    catch (SEHException ex) { observer.OnError(ex); throw; }
+                    catch (InvalidOperationException ex) { observer.OnError(ex); throw; }
                     finally
                     {
                         camera.EndAcquisition();
