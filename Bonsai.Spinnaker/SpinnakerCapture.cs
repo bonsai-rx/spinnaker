@@ -65,44 +65,50 @@ namespace Bonsai.Spinnaker
 
         static Func<IManagedImage, IplImage> GetConverter(PixelFormatEnums pixelFormat, ColorProcessingAlgorithm colorProcessing)
         {
-            ColorConversion? conversion;
-            IplDepth sourceDepth, outputDepth;
-            int sourceChannels, outputChannels;
-            if (pixelFormat == PixelFormatEnums.Mono8 ||
-                pixelFormat == PixelFormatEnums.BayerGR8 ||
-                pixelFormat == PixelFormatEnums.BayerRG8 ||
-                pixelFormat == PixelFormatEnums.BayerGB8 ||
-                pixelFormat == PixelFormatEnums.BayerBG8 ||
-                pixelFormat == PixelFormatEnums.BGR8)
+            int outputChannels;
+            IplDepth outputDepth;
+            if (pixelFormat < PixelFormatEnums.BayerGR8 || pixelFormat == PixelFormatEnums.BGR8 ||
+                pixelFormat <= PixelFormatEnums.BayerBG16 && colorProcessing == ColorProcessingAlgorithm.NoColorProcessing)
             {
-                sourceDepth = outputDepth = IplDepth.U8;
-                if (pixelFormat == PixelFormatEnums.Mono8)
+                if (pixelFormat == PixelFormatEnums.BGR8)
                 {
-                    sourceChannels = outputChannels = 1;
-                    conversion = null;
-                }
-                else if (pixelFormat == PixelFormatEnums.BGR8)
-                {
-                    sourceChannels = outputChannels = 3;
-                    conversion = null;
+                    outputChannels = 3;
+                    outputDepth = IplDepth.U8;
                 }
                 else
                 {
-                    sourceChannels = outputChannels = 1;
-                    if (colorProcessing == ColorProcessingAlgorithm.NoColorProcessing) conversion = null;
-                    else
-                    {
-                        outputChannels = 3;
-                        var conversionOffset = (5 - (int)(pixelFormat - PixelFormatEnums.BayerGR8)) % 4;
-                        conversion = ColorConversion.BayerRG2Rgb + conversionOffset;
-                    }
+                    outputChannels = 1;
+                    var depthFactor = (int)pixelFormat;
+                    if (pixelFormat > PixelFormatEnums.Mono16) depthFactor = (depthFactor - 3) / 4;
+                    outputDepth = (IplDepth)(8 * (depthFactor + 1));
                 }
+
+                return image =>
+                {
+                    var width = (int)image.Width;
+                    var height = (int)image.Height;
+                    using (var bitmapHeader = new IplImage(new Size(width, height), outputDepth, outputChannels, image.DataPtr))
+                    {
+                        var output = new IplImage(bitmapHeader.Size, outputDepth, outputChannels);
+                        CV.Copy(bitmapHeader, output);
+                        return output;
+                    }
+                };
             }
-            else if (pixelFormat == PixelFormatEnums.Mono16)
+
+            PixelFormatEnums outputFormat;
+            if (pixelFormat == PixelFormatEnums.Mono12p ||
+                pixelFormat == PixelFormatEnums.Mono12Packed)
             {
-                sourceDepth = outputDepth = IplDepth.U16;
-                sourceChannels = outputChannels = 1;
-                conversion = null;
+                outputFormat = PixelFormatEnums.Mono16;
+                outputDepth = IplDepth.U16;
+                outputChannels = 1;
+            }
+            else if (pixelFormat >= PixelFormatEnums.BayerGR8 && pixelFormat <= PixelFormatEnums.BayerBG16)
+            {
+                outputFormat = PixelFormatEnums.BGR8;
+                outputDepth = IplDepth.U8;
+                outputChannels = 3;
             }
             else throw new InvalidOperationException(string.Format("Unable to convert pixel format {0}.", pixelFormat));
 
@@ -110,12 +116,14 @@ namespace Bonsai.Spinnaker
             {
                 var width = (int)image.Width;
                 var height = (int)image.Height;
-                using (var bitmapHeader = new IplImage(new Size(width, height), sourceDepth, sourceChannels, image.DataPtr))
+                var output = new IplImage(new Size(width, height), outputDepth, outputChannels);
+                unsafe
                 {
-                    var output = new IplImage(bitmapHeader.Size, outputDepth, outputChannels);
-                    if (conversion.HasValue) CV.CvtColor(bitmapHeader, output, conversion.Value);
-                    else CV.Copy(bitmapHeader, output);
-                    return output;
+                    using (var destination = new ManagedImage((uint)width, (uint)height, 0, 0, outputFormat, output.ImageData.ToPointer()))
+                    {
+                        image.Convert(destination, outputFormat, (SpinnakerNET.ColorProcessingAlgorithm)colorProcessing);
+                        return output;
+                    }
                 }
             };
         }
