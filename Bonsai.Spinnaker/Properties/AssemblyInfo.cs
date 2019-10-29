@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Bonsai - Spinnaker Library")]
-[assembly: AssemblyDescription("Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras.")]
+[assembly: AssemblyDescription("Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 1.25.0.52 is required.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Gonçalo Lopes")]
 [assembly: AssemblyProduct("Bonsai.Spinnaker")]
