@@ -165,32 +165,35 @@ namespace Bonsai.Spinnaker
 
                         var imageFormat = default(PixelFormatEnums);
                         var converter = default(Func<IManagedImage, IplImage>);
-                        while (!cancellationToken.IsCancellationRequested)
+                        using (var cancellation = cancellationToken.Register(camera.EndAcquisition))
                         {
-                            using (var image = camera.GetNextImage())
+                            while (!cancellationToken.IsCancellationRequested)
                             {
-                                if (image.IsIncomplete)
+                                using (var image = camera.GetNextImage())
                                 {
-                                    // drop incomplete frames
-                                    continue;
-                                }
+                                    if (image.IsIncomplete)
+                                    {
+                                        // drop incomplete frames
+                                        continue;
+                                    }
 
-                                if (converter == null || image.PixelFormat != imageFormat)
-                                {
-                                    converter = GetConverter(image.PixelFormat, ColorProcessing);
-                                    imageFormat = image.PixelFormat;
-                                }
+                                    if (converter == null || image.PixelFormat != imageFormat)
+                                    {
+                                        converter = GetConverter(image.PixelFormat, ColorProcessing);
+                                        imageFormat = image.PixelFormat;
+                                    }
 
-                                var output = converter(image);
-                                observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
+                                    var output = converter(image);
+                                    observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
+                                }
                             }
                         }
                     }
                     catch (SEHException ex) { observer.OnError(ex); throw; }
                     catch (InvalidOperationException ex) { observer.OnError(ex); throw; }
+                    catch (SpinnakerException ex) { observer.OnError(ex); throw; }
                     finally
                     {
-                        camera.EndAcquisition();
                         camera.DeInit();
                         camera.Dispose();
                     }
