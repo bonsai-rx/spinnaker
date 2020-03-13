@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Bonsai - Spinnaker Library")]
-[assembly: AssemblyDescription("Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 1.25.0.52 is required.")]
+[assembly: AssemblyDescription("Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 1.29.0.5 is required.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Gonçalo Lopes")]
 [assembly: AssemblyProduct("Bonsai.Spinnaker")]
-[assembly: AssemblyCopyright("Copyright © Gonçalo Lopes 2017-2019")]
+[assembly: AssemblyCopyright("Copyright © Gonçalo Lopes 2017-2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.5.0.0")]
-[assembly: AssemblyFileVersion("0.5.0.0")]
-[assembly: AssemblyInformationalVersion("0.5.0")]
+[assembly: AssemblyVersion("0.6.0.0")]
+[assembly: AssemblyFileVersion("0.6.0.0")]
+[assembly: AssemblyInformationalVersion("0.6.0")]
 [assembly: WorkflowNamespaceIcon("Bonsai:ElementIcon.Video")]

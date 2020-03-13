@@ -6,13 +6,13 @@
     <title>$title$</title>
     <authors>$author$</authors>
     <owners>$author$</owners>
-    <licenseUrl>https://bitbucket.org/horizongir/bonsai.spinnaker/raw/4f1565edb797ce06445e047a91efe9341db0d8f0/LICENSE</licenseUrl>
-    <projectUrl>https://bitbucket.org/horizongir/bonsai.spinnaker</projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/bonsai-rx/spinnaker/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/bonsai-rx/spinnaker</projectUrl>
     <iconUrl>https://bonsai-rx.org/assets/images/bonsai.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>$author$ © 2019</copyright>
-    <releaseNotes>Support for Spinnaker version 1.25.0.52.</releaseNotes>
+    <copyright>$author$ © 2020</copyright>
+    <releaseNotes>Support for Spinnaker version 1.29.0.5.</releaseNotes>
     <tags>Bonsai FLIR PointGrey Spinnaker</tags>
   </metadata>
   <files>
