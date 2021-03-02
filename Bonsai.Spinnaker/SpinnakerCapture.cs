@@ -139,17 +139,25 @@ namespace Bonsai.Spinnaker
                     IManagedCamera camera;
                     lock (systemLock)
                     {
-                        using (var system = new ManagedSystem())
+                        try
                         {
-                            var index = Index;
-                            var cameraList = system.GetCameras();
-                            if (index < 0 || index >= cameraList.Count)
+                            using (var system = new ManagedSystem())
                             {
-                                throw new InvalidOperationException("No Spinnaker camera with the specified index was found.");
-                            }
+                                var index = Index;
+                                var cameraList = system.GetCameras();
+                                if (index < 0 || index >= cameraList.Count)
+                                {
+                                    throw new InvalidOperationException("No Spinnaker camera with the specified index was found.");
+                                }
 
-                            camera = cameraList[index];
-                            cameraList.Clear();
+                                camera = cameraList[index];
+                                cameraList.Clear();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            observer.OnError(ex);
+                            throw;
                         }
                     }
 
@@ -186,9 +194,7 @@ namespace Bonsai.Spinnaker
                             }
                         }
                     }
-                    catch (SEHException ex) { observer.OnError(ex); throw; }
-                    catch (InvalidOperationException ex) { observer.OnError(ex); throw; }
-                    catch (SpinnakerException ex) { observer.OnError(ex); throw; }
+                    catch (Exception ex) { observer.OnError(ex); throw; }
                     finally
                     {
                         camera.DeInit();
