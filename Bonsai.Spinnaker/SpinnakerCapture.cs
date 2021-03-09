@@ -15,8 +15,12 @@ namespace Bonsai.Spinnaker
     {
         static readonly object systemLock = new object();
 
-        [Description("The index of the camera from which to acquire images.")]
-        public int Index { get; set; }
+        [Description("The optional index of the camera from which to acquire images.")]
+        public int? Index { get; set; }
+
+        [TypeConverter(typeof(SerialNumberConverter))]
+        [Description("The optional serial number of the camera from which to acquire images.")]
+        public string SerialNumber { get; set; }
 
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
@@ -143,14 +147,29 @@ namespace Bonsai.Spinnaker
                         {
                             using (var system = new ManagedSystem())
                             {
-                                var index = Index;
+                                var serialNumber = SerialNumber;
                                 var cameraList = system.GetCameras();
-                                if (index < 0 || index >= cameraList.Count)
+                                if (!string.IsNullOrEmpty(serialNumber))
                                 {
-                                    throw new InvalidOperationException("No Spinnaker camera with the specified index was found.");
+                                    camera = cameraList.GetBySerial(serialNumber);
+                                    if (camera == null)
+                                    {
+                                        var message = string.Format("Spinnaker camera with serial number {0} was not found.", serialNumber);
+                                        throw new InvalidOperationException(message);
+                                    }
+                                }
+                                else
+                                {
+                                    var index = Index.GetValueOrDefault(0);
+                                    if (index < 0 || index >= cameraList.Count)
+                                    {
+                                        var message = string.Format("No Spinnaker camera was found at index {0}.", index);
+                                        throw new InvalidOperationException(message);
+                                    }
+
+                                    camera = cameraList.GetByIndex((uint)index);
                                 }
 
-                                camera = cameraList[index];
                                 cameraList.Clear();
                             }
                         }
