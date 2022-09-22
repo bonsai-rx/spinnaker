@@ -6,9 +6,11 @@ using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Bonsai.Spinnaker
 {
+    [XmlType(Namespace = Constants.XmlNamespace)]
     [Description("Acquires a sequence of images from a Spinnaker camera.")]
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
