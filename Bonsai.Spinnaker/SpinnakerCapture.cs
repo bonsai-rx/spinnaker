@@ -26,9 +26,19 @@ namespace Bonsai.Spinnaker
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
+        public bool RoiEnable { get; set; }
+
+        public int RoiOffsetX { get; set; }
+
+        public int RoiOffsetY { get; set; }
+
+        public int RoiWidth { get; set; }
+
+        public int RoiHeight { get; set; }
+
         protected virtual void Configure(IManagedCamera camera)
         {
-            var nodeMap = camera.GetNodeMap();
+            INodeMap nodeMap = camera.GetNodeMap();
             var chunkMode = nodeMap.GetNode<IBool>("ChunkModeActive");
             if (chunkMode != null && chunkMode.IsWritable)
             {
@@ -50,6 +60,8 @@ namespace Bonsai.Spinnaker
                 }
             }
 
+            setCameraROI(camera);
+
             var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
             if (acquisitionMode == null || !acquisitionMode.IsWritable)
             {
@@ -63,6 +75,34 @@ namespace Bonsai.Spinnaker
             }
 
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
+        }
+
+        private void setCameraROI(IManagedCamera camera)
+        {
+            var roiEnableNode = camera.AasRoiEnable;
+            if (roiEnableNode == null || !roiEnableNode.IsWritable)
+            {
+                throw new InvalidOperationException("ROI is not supported");
+            }
+            roiEnableNode.Value = RoiEnable;
+
+            setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset is not supported");
+            setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset is not supported");
+            setIntNodeValue(camera.AasRoiWidth, RoiWidth, "ROI width is not supported");
+            setIntNodeValue(camera.AasRoiHeight, RoiHeight, "ROI height is not supported");
+        }
+
+        private void setIntNodeValue(IInteger n, int val, string missingNodeExcMessage) {
+            if (n == null || !n.IsWritable)
+            {
+                if (missingNodeExcMessage != null)
+                {
+                    throw new InvalidOperationException(missingNodeExcMessage);
+                }
+            } else
+            {
+                n.Value = val;
+            }
         }
 
         static Func<IManagedImage, IplImage> GetConverter(PixelFormatEnums pixelFormat, ColorProcessingAlgorithm colorProcessing)
