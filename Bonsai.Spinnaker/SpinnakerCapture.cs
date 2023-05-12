@@ -26,14 +26,19 @@ namespace Bonsai.Spinnaker
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
+        [Description("Enable user defined ROI")]
         public bool RoiEnable { get; set; }
 
+        [Description("X offset of the user defined ROI")]
         public int RoiOffsetX { get; set; }
 
+        [Description("Y offset of the user defined ROI")]
         public int RoiOffsetY { get; set; }
 
+        [Description("Width of the user defined ROI")]
         public int RoiWidth { get; set; }
 
+        [Description("Height of the user defined ROI")]
         public int RoiHeight { get; set; }
 
         protected virtual void Configure(IManagedCamera camera)
