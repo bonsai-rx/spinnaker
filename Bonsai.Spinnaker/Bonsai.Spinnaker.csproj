@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Authors>Gonçalo Lopes</Authors>
     <Title>Bonsai - Spinnaker Library</Title>
-    <Description>Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 1.29.0.5 is required.</Description>
+    <Description>Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 3.1.0.79 is required.</Description>
     <Copyright>Copyright © Gonçalo Lopes 2022</Copyright>
     <ProjectUrl>https://github.com/bonsai-rx/spinnaker</ProjectUrl>
     <PackageLicenseUrl>https://github.com/bonsai-rx/spinnaker/blob/master/LICENSE</PackageLicenseUrl>
