@@ -94,12 +94,14 @@ namespace Bonsai.Spinnaker
 
         private void setCameraROI(IManagedCamera camera)
         {
-            var roiEnableNode = camera.AasRoiEnable;
-            if (roiEnableNode == null || !roiEnableNode.IsWritable)
-            {
-                throw new InvalidOperationException("ROI is not supported");
+            IBool roiEnableNode = camera.AasRoiEnable;
+            if (roiEnableNode == null) {
+                throw new InvalidOperationException("ROI enable is not supported");
+            } else if (!roiEnableNode.IsWritable) {
+                throw new InvalidOperationException("ROI enable flag is not writeable");
+            } else {
+                roiEnableNode.Value = RoiEnable;
             }
-            roiEnableNode.Value = RoiEnable;
 
             setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset is not supported");
             setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset is not supported");
