@@ -27,6 +27,11 @@ namespace Bonsai.Spinnaker
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
         [Category("ROI")]
+        [DisplayName("Auto Algorithm Selector")]
+        [Description("Select which algorithm is selected by ROI enabled")]
+        public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
+ 
+        [Category("ROI")]
         [DisplayName("Enable ROI")]
         [Description("Enable user defined ROI")]
         public bool RoiEnable { get; set; }
@@ -75,7 +80,7 @@ namespace Bonsai.Spinnaker
                 }
             }
 
-            setCameraROI(camera);
+            setCameraROI(camera, nodeMap);
 
             var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
             if (acquisitionMode == null || !acquisitionMode.IsWritable)
@@ -92,32 +97,60 @@ namespace Bonsai.Spinnaker
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
         }
 
-        private void setCameraROI(IManagedCamera camera)
+        private void setCameraROI(IManagedCamera camera, INodeMap nodeMap)
         {
+            IEnum algorithmSelectorNode = nodeMap.GetNode<IEnum>("AutoAlgorithmSelector");
+            if (algorithmSelectorNode != null && algorithmSelectorNode.IsWritable)
+            {
+                var algorithmSelectorValue = algorithmSelectorNode.GetEntryByName(Algorithm(AutoAlgorithmSelector).ToString());
+                if (algorithmSelectorValue != null && algorithmSelectorValue.IsReadable)
+                {
+                    Console.WriteLine("Write algorithm " + AutoAlgorithmSelector.ToString());
+                    algorithmSelectorNode.Value = algorithmSelectorValue.Symbolic;
+                }
+                else
+                {
+                    Console.WriteLine("Cannot Write algorithm selector");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Algorithm selector node invalid");
+            }
             IBool roiEnableNode = camera.AasRoiEnable;
             if (roiEnableNode == null) {
                 throw new InvalidOperationException("ROI enable is not supported");
-            } else if (!roiEnableNode.IsWritable) {
-                throw new InvalidOperationException("ROI enable flag is not writeable");
-            } else {
+            } else if (roiEnableNode.IsWritable) {
+                Console.WriteLine("Enable ROI");
                 roiEnableNode.Value = RoiEnable;
             }
 
-            setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset is not supported");
-            setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset is not supported");
-            setIntNodeValue(camera.AasRoiWidth, RoiWidth, "ROI width is not supported");
-            setIntNodeValue(camera.AasRoiHeight, RoiHeight, "ROI height is not supported");
+            setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset");
+            setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset");
+            setIntNodeValue(camera.AasRoiWidth, RoiWidth, "ROI width");
+            setIntNodeValue(camera.AasRoiHeight, RoiHeight, "ROI height");
         }
 
-        private void setIntNodeValue(IInteger n, int val, string missingNodeExcMessage) {
-            if (n == null || !n.IsWritable)
+        private AutoAlgorithmSelectorEnums Algorithm(AutoAlgorithmSelector algorithmSelector)
+        {
+            switch (algorithmSelector)
             {
-                if (missingNodeExcMessage != null)
-                {
-                    throw new InvalidOperationException(missingNodeExcMessage);
-                }
-            } else
+                case AutoAlgorithmSelector.AutoWhitebalance:
+                    return AutoAlgorithmSelectorEnums.Awb;
+                case AutoAlgorithmSelector.AutoExposure:
+                    return AutoAlgorithmSelectorEnums.Ae;
+                default:
+                    return (AutoAlgorithmSelectorEnums)algorithmSelector;
+            }
+        }
+
+        private void setIntNodeValue(IInteger n, int val, string nodeInfo) {
+            if (n == null)
             {
+                throw new InvalidOperationException(nodeInfo + " not supported");
+            } else if (n.IsWritable)
+            {
+                Console.WriteLine("Set {0} = {1}", nodeInfo, val);
                 n.Value = val;
             }
         }
