@@ -27,8 +27,8 @@ namespace Bonsai.Spinnaker
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
         [Category("ROI")]
-        [DisplayName("Auto Algorithm Selector")]
-        [Description("Select which algorithm is selected by ROI enabled")]
+        [DisplayName("ROI Algorithm Selector")]
+        [Description("Select algorithm for ROI")]
         public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
  
         [Category("ROI")]
@@ -105,7 +105,7 @@ namespace Bonsai.Spinnaker
                 var algorithmSelectorValue = algorithmSelectorNode.GetEntryByName(Algorithm(AutoAlgorithmSelector).ToString());
                 if (algorithmSelectorValue != null && algorithmSelectorValue.IsReadable)
                 {
-                    Console.WriteLine("Write algorithm " + AutoAlgorithmSelector.ToString());
+                    Console.WriteLine("Write algorithm {0}", AutoAlgorithmSelector);
                     algorithmSelectorNode.Value = algorithmSelectorValue.Symbolic;
                 }
                 else
@@ -148,7 +148,8 @@ namespace Bonsai.Spinnaker
             if (n == null)
             {
                 throw new InvalidOperationException(nodeInfo + " not supported");
-            } else if (n.IsWritable)
+            }
+            else if (n.IsWritable)
             {
                 Console.WriteLine("Set {0} = {1}", nodeInfo, val);
                 n.Value = val;
