@@ -118,9 +118,12 @@ namespace Bonsai.Spinnaker
                 Console.WriteLine("Algorithm selector node invalid");
             }
             IBool roiEnableNode = camera.AasRoiEnable;
-            if (roiEnableNode == null) {
+            if (roiEnableNode == null)
+            {
                 throw new InvalidOperationException("ROI enable is not supported");
-            } else if (roiEnableNode.IsWritable) {
+            }
+            else if (roiEnableNode.IsWritable)
+            {
                 Console.WriteLine("Enable ROI");
                 roiEnableNode.Value = RoiEnable;
             }
@@ -144,7 +147,8 @@ namespace Bonsai.Spinnaker
             }
         }
 
-        private void setIntNodeValue(IInteger n, int val, string nodeInfo) {
+        private void setIntNodeValue(IInteger n, int val, string nodeInfo)
+        {
             if (n == null)
             {
                 throw new InvalidOperationException(nodeInfo + " not supported");
