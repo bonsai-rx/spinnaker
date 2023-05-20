@@ -27,12 +27,12 @@ namespace Bonsai.Spinnaker
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
         [Category("ROI")]
-        [DisplayName("ROI Algorithm Selector")]
+        [DisplayName("Algorithm Selector")]
         [Description("Select algorithm for ROI")]
         public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
- 
+
         [Category("ROI")]
-        [DisplayName("Enable ROI")]
+        [DisplayName("Enable")]
         [Description("Enable user defined ROI")]
         public bool RoiEnable { get; set; }
 
@@ -47,12 +47,12 @@ namespace Bonsai.Spinnaker
         public int RoiOffsetY { get; set; }
 
         [Category("ROI")]
-        [DisplayName("Width")]
+        [DisplayName("ROI Width")]
         [Description("Width of the user defined ROI")]
         public int RoiWidth { get; set; }
 
         [Category("ROI")]
-        [DisplayName("Height")]
+        [DisplayName("ROI Height")]
         [Description("Height of the user defined ROI")]
         public int RoiHeight { get; set; }
 
