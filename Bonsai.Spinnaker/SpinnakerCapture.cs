@@ -80,7 +80,8 @@ namespace Bonsai.Spinnaker
                 }
             }
 
-            setCameraROI(camera, nodeMap);
+            setROISelector(nodeMap);
+            setCameraROI(camera);
 
             var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
             if (acquisitionMode == null || !acquisitionMode.IsWritable)
@@ -97,7 +98,7 @@ namespace Bonsai.Spinnaker
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
         }
 
-        private void setCameraROI(IManagedCamera camera, INodeMap nodeMap)
+        private void setROISelector(INodeMap nodeMap)
         {
             IEnum algorithmSelectorNode = nodeMap.GetNode<IEnum>("AutoAlgorithmSelector");
             if (algorithmSelectorNode != null && algorithmSelectorNode.IsWritable)
@@ -117,6 +118,22 @@ namespace Bonsai.Spinnaker
             {
                 Console.WriteLine("Algorithm selector node invalid");
             }
+        }
+
+        private void setCameraROI(IManagedCamera camera)
+        {
+            updateEnableROI(camera);
+            if (RoiEnable)
+            {
+                setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset");
+                setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset");
+                setIntNodeValue(camera.AasRoiWidth, RoiWidth, "ROI width");
+                setIntNodeValue(camera.AasRoiHeight, RoiHeight, "ROI height");
+            }
+        }
+
+        private void updateEnableROI(IManagedCamera camera)
+        {
             IBool roiEnableNode = camera.AasRoiEnable;
             if (roiEnableNode == null)
             {
@@ -127,11 +144,6 @@ namespace Bonsai.Spinnaker
                 Console.WriteLine("Enable ROI");
                 roiEnableNode.Value = RoiEnable;
             }
-
-            setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset");
-            setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset");
-            setIntNodeValue(camera.AasRoiWidth, RoiWidth, "ROI width");
-            setIntNodeValue(camera.AasRoiHeight, RoiHeight, "ROI height");
         }
 
         private AutoAlgorithmSelectorEnums Algorithm(AutoAlgorithmSelector algorithmSelector)
@@ -289,6 +301,7 @@ namespace Bonsai.Spinnaker
                         {
                             while (!cancellationToken.IsCancellationRequested)
                             {
+                                setCameraROI(camera);
                                 using (var image = camera.GetNextImage())
                                 {
                                     if (image.IsIncomplete)
