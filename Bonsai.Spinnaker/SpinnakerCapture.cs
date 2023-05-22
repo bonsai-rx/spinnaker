@@ -3,14 +3,32 @@ using SpinnakerNET;
 using SpinnakerNET.GenApi;
 using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Bonsai.Spinnaker
 {
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class OrderAttribute : Attribute
+    {
+        private readonly int _order;
+
+        public OrderAttribute([CallerLineNumber]int order = 0)
+        {
+            this._order = order;
+        }
+
+         public int Order { get { return _order; } }
+
+    }
+
     [XmlType(Namespace = Constants.XmlNamespace)]
+    [TypeDescriptionProvider(typeof(SpinnakerCaptureTypeDescriptorProvider))]
     [Description("Acquires a sequence of images from a Spinnaker camera.")]
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
@@ -27,51 +45,61 @@ namespace Bonsai.Spinnaker
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
         [Category("AAS ROI")]
+        [Order]
         [DisplayName("Auto ROI Algorithm Selector")]
         [Description("Select algorithm for ROI")]
         public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
 
         [Category("AAS ROI")]
+        [Order]
         [DisplayName("AAS ROI Enable")]
         [Description("Enable user defined Auto Algorithm ROI selection")]
         public bool AasRoiEnable { get; set; }
 
         [Category("AAS ROI")]
+        [Order]
         [DisplayName("AAS ROI OffsetX")]
         [Description("Auto algorithm selected ROI X offset")]
         public int AasRoiOffsetX { get; set; }
 
         [Category("AAS ROI")]
+        [Order]
         [DisplayName("AAS ROI OffsetY")]
         [Description("Auto algorithm selected ROI Y offset")]
         public int AasRoiOffsetY { get; set; }
 
         [Category("AAS ROI")]
+        [Order]
         [DisplayName("AAS ROI Width")]
         [Description("Auto algorithm selected ROI width")]
         public int AasRoiWidth { get; set; }
 
         [Category("AAS ROI")]
+        [Order]
         [DisplayName("AAS ROI Height")]
         [Description("Auto algorithm selected ROI height")]
         public int AasRoiHeight { get; set; }
 
         [Category("ROI")]
+        [Order]
         [DisplayName("OffsetX")]
         [Description("X offset from the origin to the ROI")]
         public int OffsetX { get; set; }
 
         [Category("ROI")]
+        [Order]
         [DisplayName("OffsetY")]
         [Description("Y offset from the origin to the ROI")]
         public int OffsetY { get; set; }
 
         [Category("ROI")]
+        [Order]
         [DisplayName("Width")]
         [Description("Image width")]
         public int Width { get; set; }
 
         [Category("ROI")]
+        [Order]
         [DisplayName("Height")]
         [Description("Image height")]
         public int Height { get; set; }
@@ -369,4 +397,49 @@ namespace Bonsai.Spinnaker
             });
         }
     }
+
+    public class SpinnakerCaptureTypeDescriptorProvider : TypeDescriptionProvider
+    {
+        private static TypeDescriptionProvider defaultTypeDescriptorProvider =
+                       TypeDescriptor.GetProvider(typeof(SpinnakerCapture));
+
+        public SpinnakerCaptureTypeDescriptorProvider() : base(defaultTypeDescriptorProvider)
+        {
+        }
+
+        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType,
+                                                                object instance)
+        {
+            ICustomTypeDescriptor defaultDescriptor =
+                                  base.GetTypeDescriptor(objectType, instance);
+            return new SpinnakerCaptureTypeDescriptor(defaultDescriptor, (SpinnakerCapture)instance);
+        }
+
+    }
+
+    public class SpinnakerCaptureTypeDescriptor : CustomTypeDescriptor
+    {
+        private SpinnakerCapture spinnakerCaptureInstance;
+
+        public SpinnakerCaptureTypeDescriptor(ICustomTypeDescriptor parent, SpinnakerCapture instance) : base(parent)
+        {
+            this.spinnakerCaptureInstance = (SpinnakerCapture)instance;
+        }
+
+        public override PropertyDescriptorCollection GetProperties()
+        {
+            return GetProperties(null);
+        }
+
+        public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+        {
+            return new PropertyDescriptorCollection(
+                base.GetProperties(attributes).Cast<PropertyDescriptor>()
+                .OrderBy(p => p.Category)
+                .ThenBy(p => p.DisplayName)
+                .ToArray());
+        }
+
+    }
+
 }
