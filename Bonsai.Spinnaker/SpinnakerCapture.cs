@@ -26,35 +26,55 @@ namespace Bonsai.Spinnaker
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
-        [Category("ROI")]
-        [DisplayName("Algorithm Selector")]
+        [Category("AAS ROI")]
+        [DisplayName("Auto ROI Algorithm Selector")]
         [Description("Select algorithm for ROI")]
         public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
 
-        [Category("ROI")]
-        [DisplayName("Enable")]
-        [Description("Enable user defined ROI")]
-        public bool RoiEnable { get; set; }
+        [Category("AAS ROI")]
+        [DisplayName("AAS ROI Enable")]
+        [Description("Enable user defined Auto Algorithm ROI selection")]
+        public bool AasRoiEnable { get; set; }
+
+        [Category("AAS ROI")]
+        [DisplayName("AAS ROI OffsetX")]
+        [Description("Auto algorithm selected ROI X offset")]
+        public int AasRoiOffsetX { get; set; }
+
+        [Category("AAS ROI")]
+        [DisplayName("AAS ROI OffsetY")]
+        [Description("Auto algorithm selected ROI Y offset")]
+        public int AasRoiOffsetY { get; set; }
+
+        [Category("AAS ROI")]
+        [DisplayName("AAS ROI Width")]
+        [Description("Auto algorithm selected ROI width")]
+        public int AasRoiWidth { get; set; }
+
+        [Category("AAS ROI")]
+        [DisplayName("AAS ROI Height")]
+        [Description("Auto algorithm selected ROI height")]
+        public int AasRoiHeight { get; set; }
 
         [Category("ROI")]
         [DisplayName("OffsetX")]
-        [Description("X offset of the user defined ROI")]
-        public int RoiOffsetX { get; set; }
+        [Description("X offset from the origin to the ROI")]
+        public int OffsetX { get; set; }
 
         [Category("ROI")]
         [DisplayName("OffsetY")]
-        [Description("Y offset of the user defined ROI")]
-        public int RoiOffsetY { get; set; }
+        [Description("Y offset from the origin to the ROI")]
+        public int OffsetY { get; set; }
 
         [Category("ROI")]
-        [DisplayName("ROI Width")]
-        [Description("Width of the user defined ROI")]
-        public int RoiWidth { get; set; }
+        [DisplayName("Width")]
+        [Description("Image width")]
+        public int Width { get; set; }
 
         [Category("ROI")]
-        [DisplayName("ROI Height")]
-        [Description("Height of the user defined ROI")]
-        public int RoiHeight { get; set; }
+        [DisplayName("Height")]
+        [Description("Image height")]
+        public int Height { get; set; }
 
         protected virtual void Configure(IManagedCamera camera)
         {
@@ -80,8 +100,8 @@ namespace Bonsai.Spinnaker
                 }
             }
 
-            setROISelector(nodeMap);
-            setCameraROI(camera);
+            setAasRoiSelector(nodeMap);
+            setCameraAasRoi(camera);
 
             var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
             if (acquisitionMode == null || !acquisitionMode.IsWritable)
@@ -98,7 +118,7 @@ namespace Bonsai.Spinnaker
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
         }
 
-        private void setROISelector(INodeMap nodeMap)
+        private void setAasRoiSelector(INodeMap nodeMap)
         {
             IEnum algorithmSelectorNode = nodeMap.GetNode<IEnum>("AutoAlgorithmSelector");
             if (algorithmSelectorNode != null && algorithmSelectorNode.IsWritable)
@@ -120,15 +140,15 @@ namespace Bonsai.Spinnaker
             }
         }
 
-        private void setCameraROI(IManagedCamera camera)
+        private void setCameraAasRoi(IManagedCamera camera)
         {
             updateEnableROI(camera);
-            if (RoiEnable)
+            if (AasRoiEnable)
             {
-                setIntNodeValue(camera.AasRoiOffsetX, RoiOffsetX, "ROI X offset");
-                setIntNodeValue(camera.AasRoiOffsetY, RoiOffsetY, "ROI Y offset");
-                setIntNodeValue(camera.AasRoiWidth, RoiWidth, "ROI width");
-                setIntNodeValue(camera.AasRoiHeight, RoiHeight, "ROI height");
+                setIntNodeValue(camera.AasRoiOffsetX, AasRoiOffsetX, "AAS ROI X offset");
+                setIntNodeValue(camera.AasRoiOffsetY, AasRoiOffsetY, "AAS ROI Y offset");
+                setIntNodeValue(camera.AasRoiWidth, AasRoiWidth, "AAS ROI width");
+                setIntNodeValue(camera.AasRoiHeight, AasRoiHeight, "AAS ROI height");
             }
         }
 
@@ -142,8 +162,20 @@ namespace Bonsai.Spinnaker
             else if (roiEnableNode.IsWritable)
             {
                 Console.WriteLine("Enable ROI");
-                roiEnableNode.Value = RoiEnable;
+                roiEnableNode.Value = AasRoiEnable;
             }
+        }
+
+        private void setCameraOffset(IManagedCamera camera)
+        {
+            setIntNodeValue(camera.OffsetX, OffsetX, "X offset");
+            setIntNodeValue(camera.OffsetY, OffsetY, "Y offset");
+        }
+
+        private void setImageSize(IManagedCamera camera)
+        {
+            setIntNodeValue(camera.Width, Width, "Image width");
+            setIntNodeValue(camera.Height, Height, "Image height");
         }
 
         private AutoAlgorithmSelectorEnums Algorithm(AutoAlgorithmSelector algorithmSelector)
@@ -301,7 +333,9 @@ namespace Bonsai.Spinnaker
                         {
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                setCameraROI(camera);
+                                setCameraAasRoi(camera);
+                                setCameraOffset(camera);
+                                setImageSize(camera);
                                 using (var image = camera.GetNextImage())
                                 {
                                     if (image.IsIncomplete)
