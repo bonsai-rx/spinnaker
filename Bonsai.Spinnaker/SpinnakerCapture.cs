@@ -34,72 +34,78 @@ namespace Bonsai.Spinnaker
     {
         static readonly object systemLock = new object();
 
+        [Category("Camera")]
+        [Order(0)]
         [Description("The optional index of the camera from which to acquire images.")]
         public int? Index { get; set; }
 
+        [Category("Camera")]
+        [Order(1)]
         [TypeConverter(typeof(SerialNumberConverter))]
         [Description("The optional serial number of the camera from which to acquire images.")]
         public string SerialNumber { get; set; }
 
+        [Category("Camera")]
+        [Order(2)]
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
-        [Category("AAS ROI")]
-        [Order]
-        [DisplayName("Auto ROI Algorithm Selector")]
+        [Category("ROI AutoAlgorithmSelection")]
+        [Order(0)]
+        [DisplayName("AAS ROI")]
         [Description("Select algorithm for ROI")]
         public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
 
-        [Category("AAS ROI")]
-        [Order]
+        [Category("ROI AutoAlgorithmSelection")]
+        [Order(1)]
         [DisplayName("AAS ROI Enable")]
         [Description("Enable user defined Auto Algorithm ROI selection")]
         public bool AasRoiEnable { get; set; }
 
-        [Category("AAS ROI")]
-        [Order]
+        [Category("ROI AutoAlgorithmSelection")]
+        [Order(2)]
         [DisplayName("AAS ROI OffsetX")]
         [Description("Auto algorithm selected ROI X offset")]
         public int AasRoiOffsetX { get; set; }
 
-        [Category("AAS ROI")]
-        [Order]
+        [Category("ROI AutoAlgorithmSelection")]
+        [Order(3)]
         [DisplayName("AAS ROI OffsetY")]
         [Description("Auto algorithm selected ROI Y offset")]
         public int AasRoiOffsetY { get; set; }
 
-        [Category("AAS ROI")]
-        [Order]
+        [Category("ROI AutoAlgorithmSelection")]
+        [Order(4)]
         [DisplayName("AAS ROI Width")]
         [Description("Auto algorithm selected ROI width")]
         public int AasRoiWidth { get; set; }
 
-        [Category("AAS ROI")]
-        [Order]
+        [Category("ROI AutoAlgorithmSelection")]
+        [Order(5)]
         [DisplayName("AAS ROI Height")]
         [Description("Auto algorithm selected ROI height")]
         public int AasRoiHeight { get; set; }
 
         [Category("ROI")]
-        [Order]
+        [Order(0)]
         [DisplayName("OffsetX")]
         [Description("X offset from the origin to the ROI")]
         public int OffsetX { get; set; }
 
         [Category("ROI")]
-        [Order]
+        [Order(1)]
         [DisplayName("OffsetY")]
         [Description("Y offset from the origin to the ROI")]
         public int OffsetY { get; set; }
 
         [Category("ROI")]
-        [Order]
+        [Order(2)]
         [DisplayName("Width")]
         [Description("Image width")]
         public int Width { get; set; }
 
         [Category("ROI")]
-        [Order]
+        [Order(3)]
         [DisplayName("Height")]
         [Description("Image height")]
         public int Height { get; set; }
@@ -433,11 +439,23 @@ namespace Bonsai.Spinnaker
 
         public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
         {
-            return new PropertyDescriptorCollection(
+            var properties = new PropertyDescriptorCollection(
                 base.GetProperties(attributes).Cast<PropertyDescriptor>()
                 .OrderBy(p => p.Category)
-                .ThenBy(p => p.DisplayName)
+                .ThenBy(p => {
+                    OrderAttribute a = p.Attributes.OfType<OrderAttribute>().SingleOrDefault();
+                    Console.WriteLine("Attrbibute {0} -> {1}", p.DisplayName, a.Order);
+                    return a.Order;
+                 })
                 .ToArray());
+            var n = properties.Count;
+            Console.WriteLine("!!!!! ALL: {0}", n);
+
+            for (int i = 0; i < n; i++)
+            {
+                Console.WriteLine("{0}:{1}", properties[i].Category, properties[i].DisplayName);
+            }
+            return properties;
         }
 
     }
