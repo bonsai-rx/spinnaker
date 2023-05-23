@@ -3,109 +3,48 @@ using SpinnakerNET;
 using SpinnakerNET.GenApi;
 using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Bonsai.Spinnaker
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public sealed class OrderAttribute : Attribute
-    {
-        private readonly int _order;
-
-        public OrderAttribute([CallerLineNumber]int order = 0)
-        {
-            this._order = order;
-        }
-
-         public int Order { get { return _order; } }
-
-    }
-
     [XmlType(Namespace = Constants.XmlNamespace)]
-    [TypeDescriptionProvider(typeof(SpinnakerCaptureTypeDescriptorProvider))]
     [Description("Acquires a sequence of images from a Spinnaker camera.")]
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
         static readonly object systemLock = new object();
 
         [Category("Camera")]
-        [Order(0)]
         [Description("The optional index of the camera from which to acquire images.")]
         public int? Index { get; set; }
 
         [Category("Camera")]
-        [Order(1)]
         [TypeConverter(typeof(SerialNumberConverter))]
         [Description("The optional serial number of the camera from which to acquire images.")]
         public string SerialNumber { get; set; }
 
         [Category("Camera")]
-        [Order(2)]
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
-        [Category("ROI AutoAlgorithmSelection")]
-        [Order(0)]
-        [DisplayName("AAS ROI")]
-        [Description("Select algorithm for ROI")]
-        public AutoAlgorithmSelector AutoAlgorithmSelector { get; set; }
-
-        [Category("ROI AutoAlgorithmSelection")]
-        [Order(1)]
-        [DisplayName("AAS ROI Enable")]
-        [Description("Enable user defined Auto Algorithm ROI selection")]
-        public bool AasRoiEnable { get; set; }
-
-        [Category("ROI AutoAlgorithmSelection")]
-        [Order(2)]
-        [DisplayName("AAS ROI OffsetX")]
-        [Description("Auto algorithm selected ROI X offset")]
-        public int AasRoiOffsetX { get; set; }
-
-        [Category("ROI AutoAlgorithmSelection")]
-        [Order(3)]
-        [DisplayName("AAS ROI OffsetY")]
-        [Description("Auto algorithm selected ROI Y offset")]
-        public int AasRoiOffsetY { get; set; }
-
-        [Category("ROI AutoAlgorithmSelection")]
-        [Order(4)]
-        [DisplayName("AAS ROI Width")]
-        [Description("Auto algorithm selected ROI width")]
-        public int AasRoiWidth { get; set; }
-
-        [Category("ROI AutoAlgorithmSelection")]
-        [Order(5)]
-        [DisplayName("AAS ROI Height")]
-        [Description("Auto algorithm selected ROI height")]
-        public int AasRoiHeight { get; set; }
-
         [Category("ROI")]
-        [Order(0)]
         [DisplayName("OffsetX")]
         [Description("X offset from the origin to the ROI")]
         public int OffsetX { get; set; }
 
         [Category("ROI")]
-        [Order(1)]
         [DisplayName("OffsetY")]
         [Description("Y offset from the origin to the ROI")]
         public int OffsetY { get; set; }
 
         [Category("ROI")]
-        [Order(2)]
         [DisplayName("Width")]
         [Description("Image width")]
         public int Width { get; set; }
 
         [Category("ROI")]
-        [Order(3)]
         [DisplayName("Height")]
         [Description("Image height")]
         public int Height { get; set; }
@@ -134,9 +73,6 @@ namespace Bonsai.Spinnaker
                 }
             }
 
-            setAasRoiSelector(nodeMap);
-            setCameraAasRoi(camera);
-
             var acquisitionMode = nodeMap.GetNode<IEnum>("AcquisitionMode");
             if (acquisitionMode == null || !acquisitionMode.IsWritable)
             {
@@ -150,54 +86,9 @@ namespace Bonsai.Spinnaker
             }
 
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
-        }
 
-        private void setAasRoiSelector(INodeMap nodeMap)
-        {
-            IEnum algorithmSelectorNode = nodeMap.GetNode<IEnum>("AutoAlgorithmSelector");
-            if (algorithmSelectorNode != null && algorithmSelectorNode.IsWritable)
-            {
-                var algorithmSelectorValue = algorithmSelectorNode.GetEntryByName(Algorithm(AutoAlgorithmSelector).ToString());
-                if (algorithmSelectorValue != null && algorithmSelectorValue.IsReadable)
-                {
-                    Console.WriteLine("Write algorithm {0}", AutoAlgorithmSelector);
-                    algorithmSelectorNode.Value = algorithmSelectorValue.Symbolic;
-                }
-                else
-                {
-                    Console.WriteLine("Cannot Write algorithm selector");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Algorithm selector node invalid");
-            }
-        }
-
-        private void setCameraAasRoi(IManagedCamera camera)
-        {
-            updateEnableROI(camera);
-            if (AasRoiEnable)
-            {
-                setIntNodeValue(camera.AasRoiOffsetX, AasRoiOffsetX, "AAS ROI X offset");
-                setIntNodeValue(camera.AasRoiOffsetY, AasRoiOffsetY, "AAS ROI Y offset");
-                setIntNodeValue(camera.AasRoiWidth, AasRoiWidth, "AAS ROI width");
-                setIntNodeValue(camera.AasRoiHeight, AasRoiHeight, "AAS ROI height");
-            }
-        }
-
-        private void updateEnableROI(IManagedCamera camera)
-        {
-            IBool roiEnableNode = camera.AasRoiEnable;
-            if (roiEnableNode == null)
-            {
-                throw new InvalidOperationException("ROI enable is not supported");
-            }
-            else if (roiEnableNode.IsWritable)
-            {
-                Console.WriteLine("Enable ROI");
-                roiEnableNode.Value = AasRoiEnable;
-            }
+            setCameraOffset(camera);
+            setImageSize(camera);
         }
 
         private void setCameraOffset(IManagedCamera camera)
@@ -210,19 +101,6 @@ namespace Bonsai.Spinnaker
         {
             setIntNodeValue(camera.Width, Width, "Image width");
             setIntNodeValue(camera.Height, Height, "Image height");
-        }
-
-        private AutoAlgorithmSelectorEnums Algorithm(AutoAlgorithmSelector algorithmSelector)
-        {
-            switch (algorithmSelector)
-            {
-                case AutoAlgorithmSelector.AutoWhitebalance:
-                    return AutoAlgorithmSelectorEnums.Awb;
-                case AutoAlgorithmSelector.AutoExposure:
-                    return AutoAlgorithmSelectorEnums.Ae;
-                default:
-                    return (AutoAlgorithmSelectorEnums)algorithmSelector;
-            }
         }
 
         private void setIntNodeValue(IInteger n, int val, string nodeInfo)
@@ -367,7 +245,6 @@ namespace Bonsai.Spinnaker
                         {
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                setCameraAasRoi(camera);
                                 setCameraOffset(camera);
                                 setImageSize(camera);
                                 using (var image = camera.GetNextImage())
@@ -402,62 +279,6 @@ namespace Bonsai.Spinnaker
                 TaskScheduler.Default);
             });
         }
-    }
-
-    public class SpinnakerCaptureTypeDescriptorProvider : TypeDescriptionProvider
-    {
-        private static TypeDescriptionProvider defaultTypeDescriptorProvider =
-                       TypeDescriptor.GetProvider(typeof(SpinnakerCapture));
-
-        public SpinnakerCaptureTypeDescriptorProvider() : base(defaultTypeDescriptorProvider)
-        {
-        }
-
-        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType,
-                                                                object instance)
-        {
-            ICustomTypeDescriptor defaultDescriptor =
-                                  base.GetTypeDescriptor(objectType, instance);
-            return new SpinnakerCaptureTypeDescriptor(defaultDescriptor, (SpinnakerCapture)instance);
-        }
-
-    }
-
-    public class SpinnakerCaptureTypeDescriptor : CustomTypeDescriptor
-    {
-        private SpinnakerCapture spinnakerCaptureInstance;
-
-        public SpinnakerCaptureTypeDescriptor(ICustomTypeDescriptor parent, SpinnakerCapture instance) : base(parent)
-        {
-            this.spinnakerCaptureInstance = (SpinnakerCapture)instance;
-        }
-
-        public override PropertyDescriptorCollection GetProperties()
-        {
-            return GetProperties(null);
-        }
-
-        public override PropertyDescriptorCollection GetProperties(Attribute[] attributes)
-        {
-            var properties = new PropertyDescriptorCollection(
-                base.GetProperties(attributes).Cast<PropertyDescriptor>()
-                .OrderBy(p => p.Category)
-                .ThenBy(p => {
-                    OrderAttribute a = p.Attributes.OfType<OrderAttribute>().SingleOrDefault();
-                    Console.WriteLine("Attrbibute {0} -> {1}", p.DisplayName, a.Order);
-                    return a.Order;
-                 })
-                .ToArray());
-            var n = properties.Count;
-            Console.WriteLine("!!!!! ALL: {0}", n);
-
-            for (int i = 0; i < n; i++)
-            {
-                Console.WriteLine("{0}:{1}", properties[i].Category, properties[i].DisplayName);
-            }
-            return properties;
-        }
-
     }
 
 }
