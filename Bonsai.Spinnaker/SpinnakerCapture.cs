@@ -87,20 +87,34 @@ namespace Bonsai.Spinnaker
 
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
 
-            setCameraOffset(camera);
-            setImageSize(camera);
+            setCameraROI(camera);
         }
 
-        private void setCameraOffset(IManagedCamera camera)
+        private void setCameraROI(IManagedCamera camera)
         {
-            setIntNodeValue(camera.OffsetX, OffsetX, "X offset");
-            setIntNodeValue(camera.OffsetY, OffsetY, "Y offset");
-        }
-
-        private void setImageSize(IManagedCamera camera)
-        {
-            setIntNodeValue(camera.Width, Width, "Image width");
-            setIntNodeValue(camera.Height, Height, "Image height");
+            try
+            {
+                if (OffsetX >= camera.OffsetX.Min && OffsetX < camera.OffsetX.Max)
+                {
+                    setIntNodeValue(camera.OffsetX, OffsetX, "X offset");
+                }
+                if (OffsetY >= camera.OffsetY.Min && OffsetY < camera.OffsetY.Max)
+                {
+                    setIntNodeValue(camera.OffsetY, OffsetY, "Y offset");
+                }
+                if (Width >= camera.Width.Min && Width < camera.Width.Max)
+                {
+                    setIntNodeValue(camera.Width, Width, "Image width");
+                }
+                if (Height >= camera.Height.Min && Height < camera.Height.Max)
+                {
+                    setIntNodeValue(camera.Height, Height, "Image height");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Set camera ROI exception: {0}", ex);
+            }
         }
 
         private void setIntNodeValue(IInteger n, int val, string nodeInfo)
@@ -111,7 +125,6 @@ namespace Bonsai.Spinnaker
             }
             else if (n.IsWritable)
             {
-                Console.WriteLine("Set {0} = {1}", nodeInfo, val);
                 n.Value = val;
             }
         }
@@ -245,8 +258,7 @@ namespace Bonsai.Spinnaker
                         {
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                setCameraOffset(camera);
-                                setImageSize(camera);
+                                setCameraROI(camera);
                                 using (var image = camera.GetNextImage())
                                 {
                                     if (image.IsIncomplete)
@@ -267,7 +279,12 @@ namespace Bonsai.Spinnaker
                             }
                         }
                     }
-                    catch (Exception ex) { observer.OnError(ex); throw; }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Acquisition ex: {0}", ex);
+                        observer.OnError(ex);
+                        throw;
+                    }
                     finally
                     {
                         camera.DeInit();
