@@ -3,6 +3,7 @@ using SpinnakerNET;
 using SpinnakerNET.GenApi;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -143,7 +144,7 @@ namespace Bonsai.Spinnaker
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Error trying to set {0} to {1}: {2}", nodeInfo, val, e);
+                        DebugLog("Error trying to set {0} to {1}: {2}", nodeInfo, val, e);
                         reset();
                     }
                 }
@@ -152,6 +153,13 @@ namespace Bonsai.Spinnaker
                     reset();
                 }
             }
+        }
+
+
+        [Conditional("DEBUG")]
+        private void DebugLog(string fmt, params object[] ps)
+        {
+            Console.WriteLine(fmt, ps);
         }
 
         static Func<IManagedImage, IplImage> GetConverter(PixelFormatEnums pixelFormat, ColorProcessingAlgorithm colorProcessing)
@@ -306,7 +314,7 @@ namespace Bonsai.Spinnaker
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Acquisition ex: {0}", ex);
+                        DebugLog("Acquisition ex: {0}", ex);
                         observer.OnError(ex);
                         throw;
                     }
