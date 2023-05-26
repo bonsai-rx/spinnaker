@@ -98,17 +98,33 @@ namespace Bonsai.Spinnaker
                 {
                     setIntNodeValue(camera.OffsetX, OffsetX, "X offset");
                 }
+                else
+                {
+                    OffsetX = (int)camera.OffsetX.Value;
+                }
                 if (OffsetY >= camera.OffsetY.Min && OffsetY < camera.OffsetY.Max)
                 {
                     setIntNodeValue(camera.OffsetY, OffsetY, "Y offset");
+                }
+                else
+                {
+                    OffsetY = (int)camera.OffsetY.Value;
                 }
                 if (Width >= camera.Width.Min && Width < camera.Width.Max)
                 {
                     setIntNodeValue(camera.Width, Width, "Image width");
                 }
+                else
+                {
+                    Width = (int)camera.Width.Value;
+                }
                 if (Height >= camera.Height.Min && Height < camera.Height.Max)
                 {
                     setIntNodeValue(camera.Height, Height, "Image height");
+                }
+                else
+                {
+                    Height = (int)camera.Height.Value;
                 }
             }
             catch (Exception ex)
