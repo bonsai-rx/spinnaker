@@ -90,50 +90,44 @@ namespace Bonsai.Spinnaker
             setCameraROI(camera);
         }
 
+        private delegate void ResetHandler();
+
         private void setCameraROI(IManagedCamera camera)
         {
-            try
-            {
-                if (OffsetX >= camera.OffsetX.Min && OffsetX < camera.OffsetX.Max)
-                {
-                    setIntNodeValue(camera.OffsetX, OffsetX, "X offset");
-                }
-                else
-                {
-                    OffsetX = (int)camera.OffsetX.Value;
-                }
-                if (OffsetY >= camera.OffsetY.Min && OffsetY < camera.OffsetY.Max)
-                {
-                    setIntNodeValue(camera.OffsetY, OffsetY, "Y offset");
-                }
-                else
-                {
-                    OffsetY = (int)camera.OffsetY.Value;
-                }
-                if (Width >= camera.Width.Min && Width < camera.Width.Max)
-                {
-                    setIntNodeValue(camera.Width, Width, "Image width");
-                }
-                else
-                {
-                    Width = (int)camera.Width.Value;
-                }
-                if (Height >= camera.Height.Min && Height < camera.Height.Max)
-                {
-                    setIntNodeValue(camera.Height, Height, "Image height");
-                }
-                else
-                {
-                    Height = (int)camera.Height.Value;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Set camera ROI exception: {0}", ex);
-            }
+            setIntNodeValue(
+                camera.OffsetX,
+                OffsetX,
+                camera.OffsetX.Min,
+                camera.OffsetX.Max,
+                () => OffsetX = (int)camera.OffsetX.Value,
+                "X offset");
+
+            setIntNodeValue(
+                camera.OffsetY,
+                OffsetY,
+                camera.OffsetY.Min,
+                camera.OffsetY.Max,
+                () => OffsetY = (int)camera.OffsetY.Value,
+                "Y offset");
+
+            setIntNodeValue(
+                camera.Width,
+                Width, 
+                camera.Width.Min,
+                camera.Width.Max,
+                () => Width = (int)camera.Width.Value,
+                "Image width");
+
+            setIntNodeValue(
+                camera.Height,
+                Height,
+                camera.Height.Min,
+                camera.Height.Max,
+                () => Height = (int)camera.Height.Value,
+                "Image height");
         }
 
-        private void setIntNodeValue(IInteger n, int val, string nodeInfo)
+        private void setIntNodeValue(IInteger n, int val, long min, long max, ResetHandler reset, string nodeInfo)
         {
             if (n == null)
             {
@@ -141,7 +135,22 @@ namespace Bonsai.Spinnaker
             }
             else if (n.IsWritable)
             {
-                n.Value = val;
+                if (val >= min && val <= max)
+                {
+                    try
+                    {
+                        n.Value = val;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Error trying to set {0} to {1}: {2}", nodeInfo, val, e);
+                        reset();
+                    }
+                }
+                else
+                {
+                    reset();
+                }
             }
         }
 
