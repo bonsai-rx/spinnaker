@@ -113,7 +113,7 @@ namespace Bonsai.Spinnaker
 
             setIntNodeValue(
                 camera.Width,
-                Width, 
+                Width,
                 camera.Width.Min,
                 camera.Width.Max,
                 () => Width = (int)camera.Width.Value,
