@@ -2,8 +2,6 @@
 {
     public enum ColorProcessingAlgorithm
     {
-        /** Default method. */
-        Default,
         /** No color processing. */
         NoColorProcessing,
         /**
