@@ -16,6 +16,14 @@ namespace Bonsai.Spinnaker
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
         static readonly object systemLock = new object();
+        private int _offsetX = 0;
+        private int _offsetY = 0;
+        private int _width = 0;
+        private int _height = 0;
+        private int _prevOffsetX = 0;
+        private int _prevOffsetY = 0;
+        private int _prevWidth = 0;
+        private int _prevHeight = 0;
 
         [Category("Camera")]
         [Description("The optional index of the camera from which to acquire images.")]
@@ -33,22 +41,38 @@ namespace Bonsai.Spinnaker
         [Category("ROI")]
         [DisplayName("OffsetX")]
         [Description("X offset from the origin to the ROI")]
-        public int OffsetX { get; set; }
+        public int OffsetX
+        {
+            get => _offsetX;
+            set => _offsetX = value;
+        }
 
         [Category("ROI")]
         [DisplayName("OffsetY")]
         [Description("Y offset from the origin to the ROI")]
-        public int OffsetY { get; set; }
+        public int OffsetY 
+        { 
+            get => _offsetY; 
+            set => _offsetY = value;
+        }
 
         [Category("ROI")]
         [DisplayName("Width")]
         [Description("Image width")]
-        public int Width { get; set; }
+        public int Width
+        {
+            get => _width;
+            set => _width = value;
+        }
 
         [Category("ROI")]
         [DisplayName("Height")]
         [Description("Image height")]
-        public int Height { get; set; }
+        public int Height
+        {
+            get => _height;
+            set => _height = value;
+        }
 
         protected virtual void Configure(IManagedCamera camera)
         {
@@ -91,44 +115,50 @@ namespace Bonsai.Spinnaker
             setCameraROI(camera);
         }
 
-        private delegate void ResetHandler();
+        private delegate bool UpdateCondition();
+        private delegate void OnSuccessfulUpdate();
+        private delegate void OnFailedUpdate();
 
         private void setCameraROI(IManagedCamera camera)
         {
             setIntNodeValue(
                 camera.OffsetX,
                 OffsetX,
-                camera.OffsetX.Min,
-                camera.OffsetX.Max,
-                () => OffsetX = (int)camera.OffsetX.Value,
+                () => OffsetX != _prevOffsetX && OffsetX >= camera.OffsetX.Min && OffsetX <= camera.OffsetX.Max,
+                () => _prevOffsetX = OffsetX,
+                () => OffsetX = _prevOffsetX,
                 "X offset");
 
             setIntNodeValue(
                 camera.OffsetY,
                 OffsetY,
-                camera.OffsetY.Min,
-                camera.OffsetY.Max,
-                () => OffsetY = (int)camera.OffsetY.Value,
+                () => OffsetY != _prevOffsetY && OffsetY >= camera.OffsetY.Min && OffsetY <= camera.OffsetY.Max,
+                () => _prevOffsetY = OffsetY,
+                () => OffsetY = _prevOffsetY,
                 "Y offset");
 
             setIntNodeValue(
                 camera.Width,
                 Width,
-                camera.Width.Min,
-                camera.Width.Max,
-                () => Width = (int)camera.Width.Value,
+                () => Width != _prevWidth && Width >= camera.Width.Min && Width <= camera.Width.Max,
+                () => _prevWidth = Width,
+                () => Width = _prevWidth,
                 "Image width");
 
             setIntNodeValue(
                 camera.Height,
                 Height,
-                camera.Height.Min,
-                camera.Height.Max,
-                () => Height = (int)camera.Height.Value,
+                () => Height != _prevHeight && Height >= camera.Height.Min && Height <= camera.Height.Max,
+                () => _prevHeight = Height,
+                () => Height = _prevHeight,
                 "Image height");
         }
 
-        private void setIntNodeValue(IInteger n, int val, long min, long max, ResetHandler reset, string nodeInfo)
+        private void setIntNodeValue(IInteger n, int val,
+                                     UpdateCondition cond,
+                                     OnSuccessfulUpdate successHandler,
+                                     OnFailedUpdate failHandler,
+                                     string nodeInfo)
         {
             if (n == null)
             {
@@ -136,21 +166,22 @@ namespace Bonsai.Spinnaker
             }
             else if (n.IsWritable)
             {
-                if (val >= min && val <= max)
+                if (cond())
                 {
                     try
                     {
                         n.Value = val;
+                        successHandler();
                     }
                     catch (Exception e)
                     {
                         DebugLog("Error trying to set {0} to {1}: {2}", nodeInfo, val, e);
-                        reset();
+                        failHandler();
                     }
                 }
                 else
                 {
-                    reset();
+                    failHandler();
                 }
             }
         }
