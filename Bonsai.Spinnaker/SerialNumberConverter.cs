@@ -20,8 +20,8 @@ namespace Bonsai.Spinnaker
                 var cameraList = system.GetCameras();
                 for (int i = 0; i < cameraList.Count; i++)
                 {
-                    var camera = cameraList[i];
-                    var nodeMap = camera.GetTLDeviceNodeMap();
+                    IManagedCamera camera = cameraList[i];
+                    INodeMap nodeMap = camera.GetTLDeviceNodeMap();
                     var serialNumberNode = nodeMap.GetNode<StringReg>("Std::DeviceSerialNumber");
                     if (serialNumberNode != null)
                     {

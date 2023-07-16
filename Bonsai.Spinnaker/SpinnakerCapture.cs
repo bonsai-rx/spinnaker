@@ -3,6 +3,7 @@ using SpinnakerNET;
 using SpinnakerNET.GenApi;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -15,20 +16,67 @@ namespace Bonsai.Spinnaker
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
         static readonly object systemLock = new object();
+        private int _offsetX = 0;
+        private int _offsetY = 0;
+        private int _width = 0;
+        private int _height = 0;
+        private int _prevOffsetX = 0;
+        private int _prevOffsetY = 0;
+        private int _prevWidth = 0;
+        private int _prevHeight = 0;
 
+        [Category("Camera")]
         [Description("The optional index of the camera from which to acquire images.")]
         public int? Index { get; set; }
 
+        [Category("Camera")]
         [TypeConverter(typeof(SerialNumberConverter))]
         [Description("The optional serial number of the camera from which to acquire images.")]
         public string SerialNumber { get; set; }
 
+        [Category("Camera")]
         [Description("The method used to process bayer color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
+        [Category("ROI")]
+        [DisplayName("OffsetX")]
+        [Description("X offset from the origin to the ROI")]
+        public int OffsetX
+        {
+            get => _offsetX;
+            set => _offsetX = value;
+        }
+
+        [Category("ROI")]
+        [DisplayName("OffsetY")]
+        [Description("Y offset from the origin to the ROI")]
+        public int OffsetY 
+        { 
+            get => _offsetY; 
+            set => _offsetY = value;
+        }
+
+        [Category("ROI")]
+        [DisplayName("Width")]
+        [Description("Image width")]
+        public int Width
+        {
+            get => _width;
+            set => _width = value;
+        }
+
+        [Category("ROI")]
+        [DisplayName("Height")]
+        [Description("Image height")]
+        public int Height
+        {
+            get => _height;
+            set => _height = value;
+        }
+
         protected virtual void Configure(IManagedCamera camera)
         {
-            var nodeMap = camera.GetNodeMap();
+            INodeMap nodeMap = camera.GetNodeMap();
             var chunkMode = nodeMap.GetNode<IBool>("ChunkModeActive");
             if (chunkMode != null && chunkMode.IsWritable)
             {
@@ -63,6 +111,86 @@ namespace Bonsai.Spinnaker
             }
 
             acquisitionMode.Value = continuousAcquisitionMode.Symbolic;
+
+            setCameraROI(camera);
+        }
+
+        private delegate bool UpdateCondition();
+        private delegate void OnSuccessfulUpdate();
+        private delegate void OnFailedUpdate();
+
+        private void setCameraROI(IManagedCamera camera)
+        {
+            setIntNodeValue(
+                camera.OffsetX,
+                OffsetX,
+                () => OffsetX != _prevOffsetX && OffsetX >= camera.OffsetX.Min && OffsetX <= camera.OffsetX.Max,
+                () => _prevOffsetX = OffsetX,
+                () => OffsetX = _prevOffsetX,
+                "X offset");
+
+            setIntNodeValue(
+                camera.OffsetY,
+                OffsetY,
+                () => OffsetY != _prevOffsetY && OffsetY >= camera.OffsetY.Min && OffsetY <= camera.OffsetY.Max,
+                () => _prevOffsetY = OffsetY,
+                () => OffsetY = _prevOffsetY,
+                "Y offset");
+
+            setIntNodeValue(
+                camera.Width,
+                Width,
+                () => Width != _prevWidth && Width >= camera.Width.Min && Width <= camera.Width.Max,
+                () => _prevWidth = Width,
+                () => Width = _prevWidth,
+                "Image width");
+
+            setIntNodeValue(
+                camera.Height,
+                Height,
+                () => Height != _prevHeight && Height >= camera.Height.Min && Height <= camera.Height.Max,
+                () => _prevHeight = Height,
+                () => Height = _prevHeight,
+                "Image height");
+        }
+
+        private void setIntNodeValue(IInteger n, int val,
+                                     UpdateCondition cond,
+                                     OnSuccessfulUpdate successHandler,
+                                     OnFailedUpdate failHandler,
+                                     string nodeInfo)
+        {
+            if (n == null)
+            {
+                throw new InvalidOperationException(nodeInfo + " not supported");
+            }
+            else if (n.IsWritable)
+            {
+                if (cond())
+                {
+                    try
+                    {
+                        n.Value = val;
+                        successHandler();
+                    }
+                    catch (Exception e)
+                    {
+                        DebugLog("Error trying to set {0} to {1}: {2}", nodeInfo, val, e);
+                        failHandler();
+                    }
+                }
+                else
+                {
+                    failHandler();
+                }
+            }
+        }
+
+
+        [Conditional("DEBUG")]
+        private void DebugLog(string fmt, params object[] ps)
+        {
+            Console.WriteLine(fmt, ps);
         }
 
         static Func<IManagedImage, IplImage> GetConverter(PixelFormatEnums pixelFormat, ColorProcessingAlgorithm colorProcessing)
@@ -123,7 +251,7 @@ namespace Bonsai.Spinnaker
                 {
                     using (var destination = new ManagedImage((uint)width, (uint)height, 0, 0, outputFormat, output.ImageData.ToPointer()))
                     {
-                        image.Convert(destination, outputFormat, (SpinnakerNET.ColorProcessingAlgorithm)colorProcessing);
+                        image.ConvertToWriteAbleBitmap(outputFormat, destination, (SpinnakerNET.ColorProcessingAlgorithm)colorProcessing);
                         return output;
                     }
                 }
@@ -194,6 +322,7 @@ namespace Bonsai.Spinnaker
                         {
                             while (!cancellationToken.IsCancellationRequested)
                             {
+                                setCameraROI(camera);
                                 using (var image = camera.GetNextImage())
                                 {
                                     if (image.IsIncomplete)
@@ -214,7 +343,12 @@ namespace Bonsai.Spinnaker
                             }
                         }
                     }
-                    catch (Exception ex) { observer.OnError(ex); throw; }
+                    catch (Exception ex)
+                    {
+                        DebugLog("Acquisition ex: {0}", ex);
+                        observer.OnError(ex);
+                        throw;
+                    }
                     finally
                     {
                         camera.DeInit();
@@ -227,4 +361,5 @@ namespace Bonsai.Spinnaker
             });
         }
     }
+
 }
