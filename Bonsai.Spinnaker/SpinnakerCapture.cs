@@ -99,7 +99,9 @@ namespace Bonsai.Spinnaker
             }
 
             PixelFormatEnums outputFormat;
-            if (pixelFormat == PixelFormatEnums.Mono12p ||
+            if (pixelFormat == PixelFormatEnums.Mono10p ||
+                pixelFormat == PixelFormatEnums.Mono10Packed ||
+                pixelFormat == PixelFormatEnums.Mono12p ||
                 pixelFormat == PixelFormatEnums.Mono12Packed)
             {
                 outputFormat = PixelFormatEnums.Mono16;
