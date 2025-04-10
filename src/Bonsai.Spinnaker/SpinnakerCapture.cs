@@ -10,22 +10,46 @@ using System.Xml.Serialization;
 
 namespace Bonsai.Spinnaker
 {
+    /// <summary>
+    /// Represents an operator that generates a sequence of images acquired from
+    /// the specified FLIR Spinnaker camera.
+    /// </summary>
     [XmlType(Namespace = Constants.XmlNamespace)]
     [Description("Acquires a sequence of images from a Spinnaker camera.")]
     public class SpinnakerCapture : Source<SpinnakerDataFrame>
     {
         static readonly object systemLock = new object();
 
+        /// <summary>
+        /// Gets or sets the optional index of the camera from which to acquire images.
+        /// If no serial number and no index is specified, the first detected camera
+        /// will be used.
+        /// </summary>
         [Description("The optional index of the camera from which to acquire images.")]
         public int? Index { get; set; }
 
+        /// <summary>
+        /// Gets or sets the optional serial number of the camera from which to acquire images.
+        /// If no serial number is specified, the index will be used for camera selection.
+        /// </summary>
         [TypeConverter(typeof(SerialNumberConverter))]
         [Description("The optional serial number of the camera from which to acquire images.")]
         public string SerialNumber { get; set; }
 
-        [Description("The method used to process bayer color images.")]
+        /// <summary>
+        /// Gets or sets a value specifying the method used to process bayer pattern encoded
+        /// color images.
+        /// </summary>
+        [Description("The method used to process bayer pattern encoded color images.")]
         public ColorProcessingAlgorithm ColorProcessing { get; set; }
 
+        /// <summary>
+        /// Configures the acquisition mode on the selected camera.
+        /// </summary>
+        /// <param name="camera">The camera to configure.</param>
+        /// <exception cref="InvalidOperationException">
+        /// Unable to configure the camera acquisition mode.
+        /// </exception>
         protected virtual void Configure(IManagedCamera camera)
         {
             var nodeMap = camera.GetNodeMap();
@@ -132,11 +156,37 @@ namespace Bonsai.Spinnaker
             };
         }
 
+        /// <summary>
+        /// Generates an observable sequence of images acquired from the specified FLIR
+        /// Spinnaker camera.
+        /// </summary>
+        /// <returns>
+        /// A sequence of <see cref="SpinnakerDataFrame"/> objects representing each data
+        /// frame acquired from the camera and the managed chunk data containing additional
+        /// information about the image.
+        /// </returns>
         public override IObservable<SpinnakerDataFrame> Generate()
         {
             return Generate(Observable.Return(Unit.Default));
         }
 
+        /// <summary>
+        /// Generates an observable sequence of images acquired from the specified FLIR
+        /// Spinnaker camera, where the start of acquisition is controlled by the input
+        /// sequence.
+        /// </summary>
+        /// <typeparam name="TSource">
+        /// The type of the elements in the <paramref name="start"/> sequence.
+        /// </typeparam>
+        /// <param name="start">
+        /// The sequence containing the notification used to start reading images
+        /// from the Spinnaker camera.
+        /// </param>
+        /// <returns>
+        /// A sequence of <see cref="SpinnakerDataFrame"/> objects representing each data
+        /// frame acquired from the camera and the managed chunk data containing additional
+        /// information about the image.
+        /// </returns>
         public IObservable<SpinnakerDataFrame> Generate<TSource>(IObservable<TSource> start)
         {
             return Observable.Create<SpinnakerDataFrame>((observer, cancellationToken) =>
