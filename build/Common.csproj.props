@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageType>Dependency;BonsaiLibrary</PackageType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <IncludeSymbols>true</IncludeSymbols>
+    <LangVersion>latest</LangVersion>
+    <Features>strict</Features>
+  </PropertyGroup>
+
+    <!-- For configuring launchSettings.json we need to resolve the bootstrapper output path here -->
+  <PropertyGroup>
+    <BonsaiExecutablePath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../.bonsai/Bonsai.exe'))</BonsaiExecutablePath>
+  </PropertyGroup>
+
+  <Import Project="Package.props" />
+</Project>
