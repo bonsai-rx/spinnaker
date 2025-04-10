@@ -1,23 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Authors>Gonçalo Lopes</Authors>
     <Title>Bonsai - Spinnaker Library</Title>
     <Description>Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 4.2.0.83 is required.</Description>
-    <Copyright>Copyright © Gonçalo Lopes 2022</Copyright>
-    <ProjectUrl>https://github.com/bonsai-rx/spinnaker</ProjectUrl>
-    <PackageLicenseUrl>https://github.com/bonsai-rx/spinnaker/blob/main/LICENSE</PackageLicenseUrl>
-    <PackageIconUrl>https://bonsai-rx.org/assets/images/bonsai.png</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>Bonsai Rx FLIR Spinnaker</PackageTags>
-    <IncludeSymbols Condition="'$(Configuration)'=='Release'">true</IncludeSymbols>
-    <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
-    <PackageOutputPath>..\bin\$(Configuration)</PackageOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TargetFramework>net472</TargetFramework>
     <VersionPrefix>0.8.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
-    <Features>strict</Features>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Ignore warnings about processor architecture mismatch, we resolve these on package install -->
+    <NoWarn>$(NoWarn);MSB3270</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
