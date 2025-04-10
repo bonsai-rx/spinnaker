@@ -123,7 +123,7 @@ namespace Bonsai.Spinnaker
                 {
                     using (var destination = new ManagedImage((uint)width, (uint)height, 0, 0, outputFormat, output.ImageData.ToPointer()))
                     {
-                        image.Convert(destination, outputFormat, (SpinnakerNET.ColorProcessingAlgorithm)colorProcessing);
+                        image.ConvertToBitmapSource(outputFormat, destination, (SpinnakerNET.ColorProcessingAlgorithm)colorProcessing);
                         return output;
                     }
                 }

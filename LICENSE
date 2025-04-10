@@ -1,7 +1,7 @@
-Copyright (C) 2022 Gonçalo Lopes
+Copyright (c) Bonsai Foundation CIC and Contributors
 
 In addition to the MIT license terms expressed in the following, this software
-is subject to the terms of the Point Grey Spinnaker Software Development Kit
+is subject to the terms of the FLIR Spinnaker Software Development Kit
 License Agreement (included below).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -23,132 +23,118 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ----------------------
-This software integrates and makes use of the Point Grey Spinnaker Software
+This software integrates and makes use of the FLIR Spinnaker Software
 Development Kit, which is subject to the following license agreement:
 
-PGR Spinnaker® SDK License Agreement
+FLIR Spinnaker® SDK License Agreement
 
 READ CAREFULLY: This is a legal agreement between you (an individual or a single entity)
-(“you”) and Point Grey Research Inc. (“PGR”). Before installing and using the Spinnaker®
-Software Development Kit and any updates to it that PGR may in its discretion provide to
-you (collectively, the “SDK”), you should read this agreement. If you do not agree with all of the
-terms of this agreement, do not install or use the SDK. PGR may change this agreement at any
-time and it is your responsibility to review the most updated version of it on PGR’s website
-at http://www.ptgrey.com/spinnaker-sdk. By continuing to use the SDK following such changes,
-you agree to be bound by them.
+(“you”) and FLIR Systems Inc. (“FLIR”).  Information contained in this software or
+document pertains to a Canadian product that is not controlled by the Canadian Government.
+Before installing and using the Spinnaker® Software Development Kit and any updates to it
+that we may at our discretion provide to you (collectively, the "SDK"), you should read
+this agreement.  If you do not agree with all of the terms of this agreement, do not install
+or use the SDK.  FLIR may change this agreement at any time and it is your responsibility
+to review the most updated version of it on FLIR’s website.  By continuing to use the SDK
+following such changes, you agree to be bound by them.
 
 1. Grant of License: Subject to the terms of this agreement, you are hereby granted a limited,
 terminable, non-transferable, non-exclusive license and right to use the SDK only in conjunction with:
-(a) those PGR cameras listed at http://www.ptgrey.com/cameras (as such list may be amended
-by PGR at any time and from time to time) and owned by you; and (b) the images derived from such
-cameras.
+(a) those FLIR cameras listed at https://www.flir.com/products/spinnaker-sdk (as such list may be amended
+by FLIR at any time and from time to time) and owned by you; and (b) the images derived from such cameras.
+FLIR Systems processes your personal data when you install and use the SDK in accordance with the
+information notice posted at the end of this License Agreement.
 
-2. Free and Open Source Components: Notwithstanding anything to the contrary herein, the
-use, copying and distribution of components of the SDK licensed under free and open source license
-agreements are governed solely by the terms of those license agreements (which are contained in
-the electronic documentation for the SDK) and not this agreement. It is your responsibility to review the
-terms and conditions of those license agreements and PGR will not be liable for any breach by you of
-such license agreements.
+2. Free and Open Source Components: Notwithstanding anything to the contrary herein, use, copying
+and distribution of components of the SDK licensed under free and open source license agreements are
+governed solely by the terms of those license agreements (which are contained in the electronic
+documentation for the SDK) and not this agreement.
 
 3. Restrictions: Except as (and only if) explicitly permitted by Section 4 below, you will not, and
 will not permit any third parties to: (a) copy the SDK, other than a reasonable number of backup copies
 for your own use only, and such backup copies together with the original will be kept in your possession
 and control; (b) provide or disclose the SDK to any third party; (c) alter, modify, reverse engineer,
-decompile or disassemble the SDK, or attempt to do any of the foregoing; (d) grant sublicenses, leases
+decompile or disassemble the SDK, or attempt to do any of the foregoing; (d) grant sublicenses, leases,
 or any other rights in the SDK to any third party; or (e) remove, alter or obscure any proprietary
 rights notices (including any copyright and trademark notices) on and in the SDK.
 
 4. Additional OEM Rights: If you are an original equipment manufacturer, then in addition to
 the rights set out in Section 1 above you are hereby granted a limited, terminable, non-transferable,
-non- exclusive license and right to use the SDK for the sole additional purpose of incorporating the
+non-exclusive license and right to use the SDK for the sole additional purpose of incorporating the
 libraries found in the SDK (collectively, the “Libraries”) into new products developed by you, in whole
-or in part, using the SDK (collectively, the “Derivative Products”), and you may sub-license to your
-end user customers who require such rights to use the Derivative Products the rights licensed to you
-under this agreement (other than the rights to develop Derivative Products under this Section 4), provided
-that you: (a) ensure that the components of any Derivative Product that derive functionality from any of
-the Libraries may only be used with PGR products, including the SDK, and images derived from such
-products; (b) ensure that you comply with the terms of any applicable open source license agreements
-in connection with the Derivative Products; (c) may only redistribute drivers (.inf and .sys), dynamically
-linked libraries (.dlls and .so), executables (.exe) and documentation (.doc, .txt, .pdf and .chm) and
-only to the extent necessary to support your Derivative Products. For clarity, headers (.h), source
-(.c, .cpp,.cs and .vb) and statically linked libraries (.lib and .a) cannot be redistributed; (d) will prohibit
-any, and ensure that there is no, redistribution, altering, modifying, reverse engineering, decompiling or
-disassembling of any of the Libraries by any third party, including any end user customers; (e) will
-include any PGR and third party proprietary rights legends or notices (including copyright and
-trademark notices), unaltered and unobscured, on all Derivative Products; and (f) will ensure that any
-third parties to whom the Derivative Products are distributed agree to comply with the terms of this
-agreement or terms which are at least as favourable to PGR as the terms of this agreement.
+or in part, using the SDK (collectively, the “Derivative Products”) provided that you: (a) ensure that
+the components of any Derivative Product that derive functionality from any of the Libraries may only
+be used with FLIR products, including the SDK, and images derived from such products; (b) may only
+redistribute drivers (.inf and .sys), dynamically linked libraries (.dlls and .so), executables (.exe)
+and documentation (.doc, .txt, .pdf and .chm) and only to the extent necessary to support your Derivative
+Products. For clarity, headers (.h), source (.c, .cpp,.cs and .vb) and statically linked libraries
+(.lib and .a) cannot be redistributed; (c) will prohibit any, and ensure that there is no, redistribution
+of any of the Libraries by any third party, including any end user customers; and (d) will include any
+FLIR and third party proprietary rights legends or notices (including copyright and trademark notices),
+unaltered and unobscured, on all Derivative Products.
 
-5. Ownership: PGR and third parties are the owners of and retain title to all proprietary
-and intellectual property rights (including all patent, copyright, trade secret and trademark rights) in and
-to the SDK. You have no right, title or interest in the SDK, except as specifically set forth herein, and
-no rights in any trade-marks of PGR. All rights not explicitly granted herein are hereby reserved to
-PGR. You retain ownership of and title to all proprietary and intellectual property rights of the
-Derivative Products developed by you, save and except the components of the SDK contained within
-those Derivative Products.
+5. Ownership: FLIR and third parties are the owners of and retain title to all proprietary and
+intellectual property rights (including all patent, copyright, trade secret and trademark rights) in and
+to the SDK. You have no right, title or interest in the SDK, except as specifically set forth herein,
+and no rights in any trade-marks of FLIR. All rights not explicitly granted herein are hereby reserved.
 
 6. Indemnification: You assume the entire risk relating to, and will indemnify, hold harmless
-and defend PGR from and against, any claims, actions, lawsuits, or proceedings, and any losses,
+and defend FLIR from and against any claims, actions, lawsuits, or proceedings, and any losses,
 liabilities, damages and expenses (including attorney’s fees and expenses) that arise or result from
-your activities and the activities of persons to whom you distribute Derivative Products under this
-agreement or in connection with the SDK, whether during or after termination of this agreement and
-whether or not permitted by this agreement, including the distribution or use of the SDK (including
-the Libraries) and/or the development, distribution or use of any Derivative Product (including any
+your activities under this agreement, including the distribution or use of the SDK (including the
+Libraries) and/or the development, distribution or use of any Derivative Product (including any
 intellectual property infringement claims relating thereto).
 
 7. No Warranties: Your use of the SDK is solely at your own risk. The SDK is provided “as is” and
 “as available” without warranty or condition of any kind, either express, implied or statutory, including
-implied warranties of merchantability, fitness for a particular application or purpose, title and noninfringement,
-and PGR hereby expressly disclaims all such warranties and conditions. Some jurisdictions
+implied warranties of merchantability, fitness for a particular application or purpose, title and
+non-infringement, and FLIR hereby expressly disclaims all such warranties and conditions. Some jurisdictions
 do not allow the exclusion of implied warranties, so the above exclusion may not apply to you.
 
 8. Limitation of Liability: Notwithstanding any other provision herein, to the maximum extent
-permitted by applicable law, PGR will not under any circumstances be liable for any direct, indirect,
+permitted by applicable law, FLIR will not under any circumstances be liable for any direct, indirect,
 incidental, consequential, punitive or special losses or damages (including damages for bodily injury
 or death, business interruption, loss or corruption of business information or data, loss of opportunity,
 loss of privacy, cost of recovery, financial loss, loss of revenue or loss of profits for any reason
-whatsoever) whether or not PGR has been advised or should have been aware of the possibility of any
-such losses or damage arising, and in no event will the aggregate and cumulative liability of PGR for any
+whatsoever) whether or not FLIR has been advised or should have been aware of the possibility of any
+such losses or damage arising, and in no event will the aggregate and cumulative liability of FLIR for any
 matters arising under this agreement or otherwise exceed $25.
 
-9. Changes and Support: PGR may at its sole discretion elect to provide you with limited support
-services related to the SDK for such period of time as PGR at its sole discretion elects. PGR may change
-or cease to provide the SDK and the limited support services at any time and from time to time
-without notice to you and you acknowledge that PGR is not obligated to provide the SDK or any
-support. PGR may use any technical information, feedback or ideas you provide to PGR for PGR’s
-business purposes, including product support and development.
+9. Changes and Support: FLIR may at its sole discretion elect to provide you with limited support
+services related to the SDK for such period of time as FLIR at its sole discretion elects. FLIR may change
+or cease to provide the SDK and the limited Support at any time and from time to time without notice to you
+and that FLIR is not obligated to provide the SDK or any support. FLIR may use any technical information,
+feedback or ideas you provide to FLIR for FLIR’s business purposes, including product support and development.
 
-10. Termination: PGR may terminate this agreement immediately on notice to you if you violate
-any of the terms of this agreement. PGR may also terminate this agreement for convenience provided
-that 30 days’ notice is delivered to you. Any notice given by PGR hereunder will be effective when sent
-by PGR to the email address you provided to PGR when you registered for a download account. On
-termination, for any reason, your rights hereunder will immediately cease and you must immediately
-return all copies of the SDK in your possession or under your control to PGR and on termination for
-violation or default, you will be liable to PGR for all damages suffered as a result of the violation or
-default. Sections 5-8, 10 and 12 will survive any termination hereof.
+10. Termination: FLIR may terminate this agreement immediately on notice to you if you violate
+any of the terms of this agreement. FLIR may also terminate this agreement for convenience provided
+that 30 days notice is delivered to you. Any notice given by FLIR hereunder will be effective when sent
+by FLIR to the email address you provided to FLIR when you registered for a download account. On
+termination, for any reason, your rights hereunder will cease and you must immediately return all
+copies of the SDK to FLIR and on termination for violation or default, you will be liable to FLIR for
+all damages suffered as a result of the violation or default. Sections 6-8, 10 and 12 will survive any
+termination hereof.
 
 11. Export Laws: This agreement involves products and/or technical data that may be controlled
-under laws and regulations of Canada, the United States and other countries, including the Canadian
-Export and Import Permit Act and the United States Export Administration Regulations, and any
-regulations, directives, notices, orders, policies, guidance, or advisory opinions issued thereunder, or
-any other applicable law, regulation, rule, guideline or order (collectively, “Export Laws”). You will
-comply with all Export Laws to ensure that the SDK is not exported, re-exported, transferred, sold or
-otherwise disposed of by you, directly or indirectly, in contravention of Export Laws. You represent and
-warrant to PGR that you are not a person barred from receiving the SDK under any Export Laws.
+under laws and regulations of the United States and other countries, including the United States
+Export Administration Regulations, or any other applicable law, regulation, rule, guideline or order
+(collectively, “Export Laws”).  You will comply with all Export Laws to ensure that the SDK is not
+exported, directly or indirectly, in contravention of the Export Laws.  You represent and warrant to
+FLIR that you are not a person barred from receiving the SDK under any Export Laws.
 
-12. General: This agreement is the entire agreement between you and PGR with respect to
-the subject matter of this agreement. If you are signing on behalf of an entity that is not an individual
-(such as a corporation or partnership), you represent and warrant that you have the authority to bind
-such entity. This agreement and the rights granted hereunder are personal to you and you may not
-assign this agreement to a third party without the prior written consent of PGR. This agreement is
-governed exclusively by and will be enforced, construed, and interpreted exclusively in accordance
-with the laws of British Columbia (“BC”) and the laws of Canada applicable in BC. The courts of
-the Province of BC will have exclusive jurisdiction over any dispute arising under this agreement.
-You agree that termination and/or monetary damages may not be a sufficient remedy if you breach this
-agreement and that PGR will be entitled, without waiving any other rights or remedies, to injunctive or
-equitable relief as may be deemed proper by a court of competent jurisdiction in the event of a breach.
-If PGR does not exercise any legal right or remedy in this agreement or otherwise, this will not be taken
-to be a formal waiver by PGR of its rights, which rights will remain available to PGR. If any provision
-of this agreement is construed to be illegal or invalid, the illegal or invalid provisions will be deemed
-stricken and deleted herefrom to the same extent and effect as if never incorporated herein, but all other
+12. General: This agreement is the entire agreement between you and FLIR with respect to
+the subject matter of this agreement.  If you are signing on behalf of an entity such as a corporation,
+you represent and warrant that you have the authority to bind such entity. This agreement and the
+rights granted hereunder are personal to you and you may not assign this agreement to a third party
+without the prior written consent of FLIR. This agreement is governed exclusively by and will be
+enforced, construed, and interpreted exclusively in accordance with the laws of British Columbia (“BC”)
+and the laws of Canada applicable in BC. The courts of the Province of BC will have exclusive
+jurisdiction over any dispute arising under this agreement. You agree that termination and/or monetary
+damages may not be a sufficient remedy if you breach this agreement and that FLIR will be entitled,
+without waiving any other rights or remedies, to injunctive or equitable relief as may be deemed proper
+by a court of competent jurisdiction in the event of a breach. If FLIR does not exercise any legal
+right or remedy in this agreement or otherwise, this will not be taken to be a formal waiver by FLIR
+of its rights, which rights will remain available to FLIR.  If any provision of this agreement is
+construed to be illegal or invalid, the illegal or invalid provisions will be deemed stricken and
+deleted herefrom to the same extent and effect as if never incorporated herein, but all other
 provisions hereof will continue in full force and effect.
