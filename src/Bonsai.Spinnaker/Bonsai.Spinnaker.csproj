@@ -11,6 +11,11 @@
     <VersionSuffix></VersionSuffix>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Ignore warnings about processor architecture mismatch, we resolve these on package install -->
+    <NoWarn>$(NoWarn);MSB3270</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Content Include="Bonsai.Spinnaker.props" PackagePath="build\net472" />
     <Content Include="Bonsai.Spinnaker.targets" PackagePath="build\net472" />
