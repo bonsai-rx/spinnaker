@@ -1,9 +1,5 @@
 Copyright (c) Bonsai Foundation CIC and Contributors
 
-In addition to the MIT license terms expressed in the following, this software
-is subject to the terms of the FLIR Spinnaker Software Development Kit
-License Agreement (included below).
-
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -22,7 +18,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-----------------------
+-------------------------------------------------------------------------------
+
 This software integrates and makes use of the FLIR Spinnaker Software
 Development Kit, which is subject to the following license agreement:
 
