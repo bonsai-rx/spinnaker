@@ -3,12 +3,7 @@
   <PropertyGroup>
     <Title>Bonsai - Spinnaker Library</Title>
     <Description>Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 4.2.0.83 is required.</Description>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>Bonsai Rx FLIR Spinnaker</PackageTags>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TargetFramework>net472</TargetFramework>
-    <VersionPrefix>0.8.0</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup>
