@@ -8,6 +8,7 @@
 # Config
 *.gitignore text
 *.gitattributes text
+*.gitmodules text eol=lf
 *.editorconfig text
 *.git-blame-ignore-revs text
 *.sln text
@@ -18,7 +19,6 @@
 *.wixproj text
 *.config text
 *.json text
-*.html text
 *.xml text
 *.yml text
 
@@ -39,4 +39,5 @@ LICENSE text
 # Graphics
 *.png binary
 *.ico binary
+*.gif binary
 *.svg text

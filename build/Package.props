@@ -1,16 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Authors>Bonsai</Authors>
-    <Copyright>Copyright © Bonsai Foundation CIC and Contributors</Copyright>
-    <PackageProjectUrl>https://github.com/bonsai-rx/spinnaker</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>icon.png</PackageIcon>
-  </PropertyGroup>
+    <PackageTags>Bonsai Rx FLIR Spinnaker</PackageTags>
+    <PackageProjectUrl>https://bonsai-rx.org/spinnaker</PackageProjectUrl>
 
-  <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\LICENSE" PackagePath="/" />
-    <Content Include="$(MSBuildThisFileDirectory)icon.png" PackagePath="/" />
-    <Content Include="$(MSBuildThisFileDirectory)..\README.md" PackagePath="/" />
-  </ItemGroup>
+    <Authors>Bonsai Foundation</Authors>
+    <Copyright>Copyright © Bonsai Foundation CIC and Contributors</Copyright>
+  </PropertyGroup>
 </Project>
