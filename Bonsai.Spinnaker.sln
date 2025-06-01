@@ -1,20 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bonsai.Spinnaker", "src\Bonsai.Spinnaker\Bonsai.Spinnaker.csproj", "{7A8DBCD4-4FCA-4AEA-BFC1-BE504EC38CDB}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F8EDE6CB-2C1C-459B-98D1-B5D87D463A5C}"
-	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{E5660408-9097-4C96-BAA2-793E4886A481}"
 	ProjectSection(SolutionItems) = preProject
 		build\Common.csproj.props = build\Common.csproj.props
+		build\Common.csproj.targets = build\Common.csproj.targets
+		build\Common.Tests.csproj.props = build\Common.Tests.csproj.props
 		build\icon.png = build\icon.png
 		build\Package.props = build\Package.props
+		build\Project.csproj.props = build\Project.csproj.props
 	EndProjectSection
 EndProject
 Global
