@@ -190,6 +190,7 @@ namespace Bonsai.Spinnaker
         /// </returns>
         public IObservable<SpinnakerDataFrame> Generate<TSource>(IObservable<TSource> start)
         {
+            var captureInstance = (SpinnakerCapture)MemberwiseClone();
             return Observable.Create<SpinnakerDataFrame>((observer, cancellationToken) =>
             {
                 return Task.Factory.StartNew(async () =>
@@ -200,7 +201,7 @@ namespace Bonsai.Spinnaker
                         try
                         {
                             using var system = new ManagedSystem();
-                            var serialNumber = SerialNumber;
+                            var serialNumber = captureInstance.SerialNumber;
                             var cameraList = system.GetCameras();
                             if (!string.IsNullOrEmpty(serialNumber))
                             {
@@ -213,7 +214,7 @@ namespace Bonsai.Spinnaker
                             }
                             else
                             {
-                                var index = Index.GetValueOrDefault(0);
+                                var index = captureInstance.Index.GetValueOrDefault(0);
                                 if (index < 0 || index >= cameraList.Count)
                                 {
                                     var message = string.Format("No Spinnaker camera was found at index {0}.", index);
@@ -236,9 +237,9 @@ namespace Bonsai.Spinnaker
                     try
                     {
                         camera.Init();
-                        Configure(camera);
+                        captureInstance.Configure(camera);
 
-                        imageListener = new ImageEventListener(observer, ColorProcessing);
+                        imageListener = new ImageEventListener(observer, captureInstance.ColorProcessing);
                         camera.RegisterEventHandler(imageListener);
                         await start.ToTask(cancellationToken);
 
