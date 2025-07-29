@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -198,33 +199,31 @@ namespace Bonsai.Spinnaker
                     {
                         try
                         {
-                            using (var system = new ManagedSystem())
+                            using var system = new ManagedSystem();
+                            var serialNumber = SerialNumber;
+                            var cameraList = system.GetCameras();
+                            if (!string.IsNullOrEmpty(serialNumber))
                             {
-                                var serialNumber = SerialNumber;
-                                var cameraList = system.GetCameras();
-                                if (!string.IsNullOrEmpty(serialNumber))
+                                camera = cameraList.GetBySerial(serialNumber);
+                                if (camera == null)
                                 {
-                                    camera = cameraList.GetBySerial(serialNumber);
-                                    if (camera == null)
-                                    {
-                                        var message = string.Format("Spinnaker camera with serial number {0} was not found.", serialNumber);
-                                        throw new InvalidOperationException(message);
-                                    }
+                                    var message = string.Format("Spinnaker camera with serial number {0} was not found.", serialNumber);
+                                    throw new InvalidOperationException(message);
                                 }
-                                else
-                                {
-                                    var index = Index.GetValueOrDefault(0);
-                                    if (index < 0 || index >= cameraList.Count)
-                                    {
-                                        var message = string.Format("No Spinnaker camera was found at index {0}.", index);
-                                        throw new InvalidOperationException(message);
-                                    }
-
-                                    camera = cameraList.GetByIndex((uint)index);
-                                }
-
-                                cameraList.Clear();
                             }
+                            else
+                            {
+                                var index = Index.GetValueOrDefault(0);
+                                if (index < 0 || index >= cameraList.Count)
+                                {
+                                    var message = string.Format("No Spinnaker camera was found at index {0}.", index);
+                                    throw new InvalidOperationException(message);
+                                }
+
+                                camera = cameraList.GetByIndex((uint)index);
+                            }
+
+                            cameraList.Clear();
                         }
                         catch (Exception ex)
                         {
@@ -233,42 +232,25 @@ namespace Bonsai.Spinnaker
                         }
                     }
 
+                    ImageEventListener imageListener = null;
                     try
                     {
                         camera.Init();
                         Configure(camera);
+
+                        imageListener = new ImageEventListener(observer, ColorProcessing);
+                        camera.RegisterEventHandler(imageListener);
+                        await start.ToTask(cancellationToken);
+
                         camera.BeginAcquisition();
-                        await start;
-
-                        var imageFormat = default(PixelFormatEnums);
-                        var converter = default(Func<IManagedImage, IplImage>);
-                        using (var cancellation = cancellationToken.Register(camera.EndAcquisition))
-                        {
-                            while (!cancellationToken.IsCancellationRequested)
-                            {
-                                using (var image = camera.GetNextImage())
-                                {
-                                    if (image.IsIncomplete)
-                                    {
-                                        // drop incomplete frames
-                                        continue;
-                                    }
-
-                                    if (converter == null || image.PixelFormat != imageFormat)
-                                    {
-                                        converter = GetConverter(image.PixelFormat, ColorProcessing);
-                                        imageFormat = image.PixelFormat;
-                                    }
-
-                                    var output = converter(image);
-                                    observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
-                                }
-                            }
-                        }
+                        cancellationToken.WaitHandle.WaitOne();
+                        camera.EndAcquisition();
                     }
                     catch (Exception ex) { observer.OnError(ex); throw; }
                     finally
                     {
+                        if (imageListener is not null)
+                            camera.UnregisterEventHandler(imageListener);
                         camera.DeInit();
                         camera.Dispose();
                     }
@@ -277,6 +259,47 @@ namespace Bonsai.Spinnaker
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
             });
+        }
+
+        class ImageEventListener : ManagedImageEventHandler
+        {
+            readonly IObserver<SpinnakerDataFrame> observer;
+            readonly ColorProcessingAlgorithm colorProcessing;
+            Func<IManagedImage, IplImage> converter;
+            PixelFormatEnums pixelFormat;
+
+            public ImageEventListener(IObserver<SpinnakerDataFrame> observer, ColorProcessingAlgorithm colorProcessing)
+            {
+                this.observer = observer ?? throw new ArgumentNullException(nameof(observer));
+                this.colorProcessing = colorProcessing;
+            }
+
+            protected override void OnImageEvent(ManagedImage image)
+            {
+                try
+                {
+                    if (image.IsIncomplete)
+                        return;
+
+                    if (converter == null || image.PixelFormat != pixelFormat)
+                    {
+                        converter = GetConverter(image.PixelFormat, colorProcessing);
+                        pixelFormat = image.PixelFormat;
+                    }
+
+                    var output = converter(image);
+                    observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
+                }
+                catch (Exception ex)
+                {
+                    observer.OnError(ex);
+                    throw;
+                }
+                finally
+                {
+                    image.Release();
+                }
+            }
         }
     }
 }
