@@ -289,7 +289,7 @@ namespace Bonsai.Spinnaker
                     }
 
                     var output = converter(image);
-                    observer.OnNext(new SpinnakerDataFrame(output, image.ChunkData));
+                    observer.OnNext(new SpinnakerDataFrame(output, new SpinnakerChunkData(image.ChunkData)));
                 }
                 catch (Exception ex)
                 {

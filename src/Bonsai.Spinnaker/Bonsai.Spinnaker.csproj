@@ -2,21 +2,16 @@
 
   <PropertyGroup>
     <Title>Bonsai - Spinnaker Library</Title>
-    <Description>Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. Spinnaker SDK version 4.2.0.83 is required.</Description>
+    <Description>Bonsai Library containing modules for acquiring images from FLIR Spinnaker cameras. A compatible FLIR Spinnaker SDK must be installed on the machine.</Description>
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <!-- Ignore warnings about processor architecture mismatch, we resolve these on package install -->
-    <NoWarn>$(NoWarn);MSB3270</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
-    <Content Include="Bonsai.Spinnaker.props" PackagePath="build\net472" />
-    <Content Include="Bonsai.Spinnaker.targets" PackagePath="build\net472" />
-    <Content Include="..\Externals\SpinnakerNET\**\*.dll" PackagePath="build\net472\bin" />
+    <None Include="Bonsai.Spinnaker.props" Pack="true" PackagePath="build\net472" />
+    <None Include="..\Externals\SpinnakerNET\ref\SpinnakerNET_v140.dll" Pack="true" PackagePath="build\net472\ref" />
     <Reference Include="SpinnakerNET_v140">
-      <HintPath>..\Externals\SpinnakerNET\x64\SpinnakerNET_v140.dll</HintPath>
+      <HintPath>..\Externals\SpinnakerNET\ref\SpinnakerNET_v140.dll</HintPath>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 
