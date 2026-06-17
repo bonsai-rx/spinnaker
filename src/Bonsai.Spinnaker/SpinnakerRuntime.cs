@@ -24,6 +24,7 @@ namespace Bonsai.Spinnaker
         const string AssemblyName = "SpinnakerNET_v140";
         const string AssemblyFileName = AssemblyName + ".dll";
         const string PathEnvironmentVariable = "PATH";
+        const int SupportedMajorVersion = 4;
 
         static Assembly spinnakerAssembly;
 
@@ -46,11 +47,22 @@ namespace Bonsai.Spinnaker
             if (directory == null)
                 return null;
 
-            AddLibraryPath(directory);
             var assemblyPath = Path.Combine(directory, AssemblyFileName);
             if (!File.Exists(assemblyPath))
                 return null;
 
+            var installedVersion = System.Reflection.AssemblyName.GetAssemblyName(assemblyPath).Version;
+            if (installedVersion.Major != SupportedMajorVersion)
+            {
+                var message = string.Format(
+                    "The installed Spinnaker SDK (SpinnakerNET {0}) is not supported. This build requires " +
+                    "SpinnakerNET major version {1}. Install a compatible Spinnaker SDK, or update to a " +
+                    "package version targeting the installed SDK.",
+                    installedVersion, SupportedMajorVersion);
+                throw new InvalidOperationException(message);
+            }
+
+            AddLibraryPath(directory);
             return spinnakerAssembly = Assembly.LoadFrom(assemblyPath);
         }
 
