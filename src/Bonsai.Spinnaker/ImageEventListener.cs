@@ -71,17 +71,20 @@ namespace Bonsai.Spinnaker
             }
 
             PixelFormatEnums outputFormat;
+            SpinnakerNET.ColorProcessingAlgorithm nativeColorProcessing;
             if (pixelFormat == PixelFormatEnums.Mono10p ||
                 pixelFormat == PixelFormatEnums.Mono10Packed ||
                 pixelFormat == PixelFormatEnums.Mono12p ||
                 pixelFormat == PixelFormatEnums.Mono12Packed)
             {
+                nativeColorProcessing = SpinnakerNET.ColorProcessingAlgorithm.NONE;
                 outputFormat = PixelFormatEnums.Mono16;
                 outputDepth = IplDepth.U16;
                 outputChannels = 1;
             }
             else if (pixelFormat >= PixelFormatEnums.BayerGR8 && pixelFormat <= PixelFormatEnums.BayerBG16)
             {
+                nativeColorProcessing = GetColorProcessingAlgorithm(colorProcessing);
                 outputFormat = PixelFormatEnums.BGR8;
                 outputDepth = IplDepth.U8;
                 outputChannels = 3;
@@ -96,9 +99,28 @@ namespace Bonsai.Spinnaker
                 unsafe
                 {
                     using var destination = new ManagedImage((uint)width, (uint)height, 0, 0, outputFormat, output.ImageData.ToPointer());
-                    image.ConvertToBitmapSource(outputFormat, destination, (SpinnakerNET.ColorProcessingAlgorithm)colorProcessing);
+                    image.ConvertToBitmapSource(outputFormat, destination, nativeColorProcessing);
                     return output;
                 }
+            };
+        }
+
+        static SpinnakerNET.ColorProcessingAlgorithm GetColorProcessingAlgorithm(ColorProcessingAlgorithm colorProcessing)
+        {
+            return colorProcessing switch
+            {
+                ColorProcessingAlgorithm.Default => SpinnakerNET.ColorProcessingAlgorithm.NEAREST_NEIGHBOR,
+                ColorProcessingAlgorithm.NoColorProcessing => SpinnakerNET.ColorProcessingAlgorithm.NONE,
+                ColorProcessingAlgorithm.NearestNeighbor => SpinnakerNET.ColorProcessingAlgorithm.NEAREST_NEIGHBOR,
+                ColorProcessingAlgorithm.NearestNeighborAverage => SpinnakerNET.ColorProcessingAlgorithm.NEAREST_NEIGHBOR_AVG,
+                ColorProcessingAlgorithm.Bilinear => SpinnakerNET.ColorProcessingAlgorithm.BILINEAR,
+                ColorProcessingAlgorithm.EdgeSensing => SpinnakerNET.ColorProcessingAlgorithm.EDGE_SENSING,
+                ColorProcessingAlgorithm.HQLinear => SpinnakerNET.ColorProcessingAlgorithm.HQ_LINEAR,
+                ColorProcessingAlgorithm.Ipp => SpinnakerNET.ColorProcessingAlgorithm.IPP,
+                ColorProcessingAlgorithm.DirectionalFilter => SpinnakerNET.ColorProcessingAlgorithm.DIRECTIONAL_FILTER,
+                ColorProcessingAlgorithm.Rigorous => SpinnakerNET.ColorProcessingAlgorithm.RIGOROUS,
+                ColorProcessingAlgorithm.WeightedDirectionalFilter => SpinnakerNET.ColorProcessingAlgorithm.WEIGHTED_DIRECTIONAL_FILTER,
+                _ => throw new ArgumentOutOfRangeException(nameof(colorProcessing))
             };
         }
     }
