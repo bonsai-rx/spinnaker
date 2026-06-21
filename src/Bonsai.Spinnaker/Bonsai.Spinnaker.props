@@ -1,12 +1,8 @@
-﻿<Project>
-  <ItemGroup Condition="'$(Platform.ToLower())' == 'x86' Or '$(Platform.ToLower())' == 'anycpu'">
+<Project>
+  <ItemGroup>
     <Reference Include="SpinnakerNET_v140">
-      <HintPath>$(MSBuildThisFileDirectory)..\..\build\net472\bin\x86\SpinnakerNET_v140.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Platform.ToLower())' == 'x64'">
-    <Reference Include="SpinnakerNET_v140">
-      <HintPath>$(MSBuildThisFileDirectory)..\..\build\net472\bin\x64\SpinnakerNET_v140.dll</HintPath>
+      <HintPath>$(MSBuildThisFileDirectory)ref\SpinnakerNET_v140.dll</HintPath>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 </Project>
